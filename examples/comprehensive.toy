@@ -79,5 +79,72 @@ if a {
 result = a * b + a / b - 1;
 print result;
 
+// Test comparison operators
+c = 10;
+d = 5;
+
+// Equality comparisons
+result = c == d;
+print result;  // 0 (false)
+
+result = c != d;
+print result;  // 1 (true)
+
+result = d == 5;
+print result;  // 1 (true)
+
+// Less than comparisons
+result = d < c;
+print result;  // 1 (true)
+
+result = c < d;
+print result;  // 0 (false)
+
+// Greater than comparisons
+result = c > d;
+print result;  // 1 (true)
+
+result = d > c;
+print result;  // 0 (false)
+
+// Less than or equal
+result = d <= 5;
+print result;  // 1 (true)
+
+result = c <= d;
+print result;  // 0 (false)
+
+// Greater than or equal
+result = c >= 10;
+print result;  // 1 (true)
+
+result = d >= c;
+print result;  // 0 (false)
+
+// Comparisons in conditionals
+if c > d {
+    print 100;
+}
+
+if d == 5 {
+    print 200;
+} else {
+    print 300;
+}
+
+// Comparisons with arithmetic
+result = c + 5 > d * 2;
+print result;  // 15 > 10 = 1 (true)
+
+result = c - 5 == d;
+print result;  // 5 == 5 = 1 (true)
+
+// Comparison in while loop
+counter = 3;
+while counter > 0 {
+    print counter;
+    counter = counter - 1;
+}
+
 // End marker
 print 9999;

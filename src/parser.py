@@ -44,7 +44,7 @@ class ASTBuilder(Transformer):
     def var(self, items):
         return Var(name=str(items[0]))
 
-    # Binary operations
+    # Binary operations - Arithmetic
     def add(self, items):
         return BinOp(op="+", left=items[0], right=items[1])
 
@@ -56,6 +56,25 @@ class ASTBuilder(Transformer):
 
     def div(self, items):
         return BinOp(op="/", left=items[0], right=items[1])
+
+    # Binary operations - Comparisons
+    def eq(self, items):
+        return BinOp(op="==", left=items[0], right=items[1])
+
+    def ne(self, items):
+        return BinOp(op="!=", left=items[0], right=items[1])
+
+    def lt(self, items):
+        return BinOp(op="<", left=items[0], right=items[1])
+
+    def le(self, items):
+        return BinOp(op="<=", left=items[0], right=items[1])
+
+    def gt(self, items):
+        return BinOp(op=">", left=items[0], right=items[1])
+
+    def ge(self, items):
+        return BinOp(op=">=", left=items[0], right=items[1])
 
 
 class Parser:

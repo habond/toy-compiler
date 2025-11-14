@@ -19,9 +19,19 @@ else_block: "else" "{" statement* "}"
 
 while_stmt: "while" expr "{" statement* "}"
 
-?expr: term
-     | expr "+" term   -> add
-     | expr "-" term   -> sub
+?expr: comparison
+
+?comparison: arith
+           | comparison "==" arith  -> eq
+           | comparison "!=" arith  -> ne
+           | comparison "<" arith   -> lt
+           | comparison "<=" arith  -> le
+           | comparison ">" arith   -> gt
+           | comparison ">=" arith  -> ge
+
+?arith: term
+      | arith "+" term   -> add
+      | arith "-" term   -> sub
 
 ?term: factor
      | term "*" factor  -> mul

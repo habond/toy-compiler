@@ -1,0 +1,45 @@
+// Test comparison operators
+x = 5;
+y = 10;
+
+// Equality
+result = x == y;
+print result;
+
+result = x != y;
+print result;
+
+// Less than
+result = x < y;
+print result;
+
+result = y < x;
+print result;
+
+// Less than or equal
+result = x <= y;
+print result;
+
+result = x <= 5;
+print result;
+
+// Greater than
+result = x > y;
+print result;
+
+result = y > x;
+print result;
+
+// Greater than or equal
+result = y >= x;
+print result;
+
+result = x >= 5;
+print result;
+
+// Complex expressions
+result = x + 1 < y - 2;
+print result;
+
+result = x * 2 == y;
+print result;

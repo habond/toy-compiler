@@ -8,6 +8,7 @@ The language supports:
 
 - **Variables**: Assignment and usage
 - **Arithmetic**: `+`, `-`, `*`, `/` with proper operator precedence
+- **Comparisons**: `==`, `!=`, `<`, `<=`, `>`, `>=`
 - **Control Flow**: `if` statements with optional `else` blocks, `while` loops
 - **Output**: `print` statement
 - **Comments**: Single-line comments with `//`
@@ -27,24 +28,50 @@ y = 20;
 z = x + y * 2;  // Supports operator precedence
 ```
 
+### Comparisons
+```
+// All comparison operators return 1 (true) or 0 (false)
+result = x == y;   // Equal to
+result = x != y;   // Not equal to
+result = x < y;    // Less than
+result = x <= y;   // Less than or equal
+result = x > y;    // Greater than
+result = x >= y;   // Greater than or equal
+
+// Comparisons work with expressions
+result = x + 1 < y * 2;
+```
+
 ### Conditionals
 ```
-// Conditions are truthy/falsy (non-zero/zero)
-if x {
+// Conditions support both truthy/falsy and comparisons
+if x > 5 {
     print 100;
 } else {
     print 200;
 }
 
-// Else block is optional
-if y {
+// Truthy/falsy evaluation (non-zero/zero)
+if x {
     print 999;
+}
+
+// Else block is optional
+if y == 0 {
+    print 0;
 }
 ```
 
 ### Loops
 ```
-// While loops with truthy/falsy conditions
+// While loops with comparisons
+counter = 5;
+while counter > 0 {
+    print counter;
+    counter = counter - 1;
+}
+
+// Truthy/falsy also works
 x = 5;
 while x {
     print x;
@@ -75,7 +102,11 @@ toy-compiler/
 │   ├── conditional.toy
 │   ├── conditional.expected
 │   ├── loop.toy
-│   └── loop.expected
+│   ├── loop.expected
+│   ├── comparisons.toy
+│   ├── comparisons.expected
+│   ├── comprehensive.toy
+│   └── comprehensive.expected
 ├── build/                # Build outputs (assembly, objects, executables)
 ├── Dockerfile            # Docker image for NASM + ld
 ├── compile.sh            # Build script (compile -> assemble -> link -> test)
@@ -282,6 +313,8 @@ The `examples/` directory contains several programs demonstrating language featu
 - **test.toy**: Variable reassignment
 - **conditional.toy**: If/else statements with truthy/falsy conditions
 - **loop.toy**: While loops including nested loops
+- **comparisons.toy**: All comparison operators (`==`, `!=`, `<`, `<=`, `>`, `>=`)
+- **comprehensive.toy**: Complete feature showcase with nested loops, conditionals, comparisons, and arithmetic
 
 Each example has a corresponding `.expected` file for automated testing.
 

@@ -75,6 +75,60 @@ idiv rbx
 push qword rax
 """
 
+ASM_BINOP_LTE = """
+pop rbx
+pop rax
+cmp rax, rbx
+setle al
+movzx rax, al
+push qword rax
+"""
+
+ASM_BINOP_LT = """
+pop rbx
+pop rax
+cmp rax, rbx
+setl al
+movzx rax, al
+push qword rax
+"""
+
+ASM_BINOP_EQ = """
+pop rbx
+pop rax
+cmp rax, rbx
+sete al
+movzx rax, al
+push qword rax
+"""
+
+ASM_BINOP_NEQ = """
+pop rbx
+pop rax
+cmp rax, rbx
+setne al
+movzx rax, al
+push qword rax
+"""
+
+ASM_BINOP_GT = """
+pop rbx
+pop rax
+cmp rax, rbx
+setg al
+movzx rax, al
+push qword rax
+"""
+
+ASM_BINOP_GTE = """
+pop rbx
+pop rax
+cmp rax, rbx
+setge al
+movzx rax, al
+push qword rax
+"""
+
 ASM_IF = """
 pop rax
 cmp rax, 0
@@ -217,6 +271,18 @@ class Compiler:
                         self.emit(ASM_BINOP_MUL)
                     case '/':
                         self.emit(ASM_BINOP_DIV)
+                    case '<=':
+                        self.emit(ASM_BINOP_LTE)
+                    case '<':
+                        self.emit(ASM_BINOP_LT)
+                    case '==':
+                        self.emit(ASM_BINOP_EQ)
+                    case '!=':
+                        self.emit(ASM_BINOP_NEQ)
+                    case '>':
+                        self.emit(ASM_BINOP_GT)
+                    case '>=':
+                        self.emit(ASM_BINOP_GTE)
                     case other:
                         raise ValueError(f"Unexpected operator '{other}'")
             
