@@ -1,0 +1,7 @@
+// Arithmetic operations demo
+// Tests operator precedence: * and / before + and -
+a = 10;
+b = 20;
+c = a + b * 2;  // 10 + 40 = 50
+d = c / 5;      // 50 / 5 = 10
+print d;

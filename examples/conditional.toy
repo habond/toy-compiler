@@ -1,0 +1,26 @@
+// Conditional statements demo
+// Non-zero values are truthy, zero is falsy
+x = 5;
+y = 0;
+
+// x is truthy (non-zero), prints 100 and 200
+if x {
+    print 100;
+    print 200;
+} else {
+    print 300;
+}
+
+// y is falsy (zero), nothing printed
+if y {
+    print 999;
+}
+
+// Expression evaluates to 0, prints 666
+if 1 - 1 {
+    print 888;
+} else {
+    print 666;
+}
+
+print 42;

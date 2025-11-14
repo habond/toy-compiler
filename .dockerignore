@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.claude/
+
+# Build artifacts (copied at runtime via volume mount)
+build/
+*.o
+*.asm
+
+# Git
+.git/
+.gitignore
+
+# Cache
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+
+# Documentation
+README.md
+
+# Other
+.DS_Store
+*.log

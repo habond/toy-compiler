@@ -1,0 +1,43 @@
+// Simple toy language grammar
+
+?start: statement+
+
+?statement: assignment
+          | print_stmt
+          | if_stmt
+          | while_stmt
+
+assignment: NAME "=" expr ";"
+
+print_stmt: "print" expr ";"
+
+if_stmt: "if" expr then_block else_block?
+
+then_block: "{" statement* "}"
+
+else_block: "else" "{" statement* "}"
+
+while_stmt: "while" expr "{" statement* "}"
+
+?expr: term
+     | expr "+" term   -> add
+     | expr "-" term   -> sub
+
+?term: factor
+     | term "*" factor  -> mul
+     | term "/" factor  -> div
+
+?factor: atom
+       | "(" expr ")"
+
+?atom: NUMBER           -> number
+     | NAME             -> var
+
+NAME: /[a-zA-Z_][a-zA-Z0-9_]*/
+NUMBER: /[0-9]+/
+
+COMMENT: "//" /[^\n]*/
+
+%import common.WS
+%ignore WS
+%ignore COMMENT
