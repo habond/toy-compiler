@@ -25,3 +25,7 @@ Thumbs.db
 
 # Ruff cache
 .ruff_cache/
+
+# VSCode extension build artifacts
+*.vsix
+vscode-extension/node_modules/

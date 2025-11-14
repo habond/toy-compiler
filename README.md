@@ -318,10 +318,43 @@ The `examples/` directory contains several programs demonstrating language featu
 
 Each example has a corresponding `.expected` file for automated testing.
 
+## IDE Support
+
+### VSCode Extension
+
+A VSCode extension is available in the `vscode-extension/` directory providing:
+
+- **Syntax highlighting** for all Toy language constructs
+- **Auto-closing brackets** and parentheses
+- **Comment toggling** (Cmd/Ctrl + /)
+- **Code folding** support
+- **Bracket matching**
+
+#### Installation
+
+1. Install the packaging tool (if not already installed):
+   ```bash
+   npm install -g @vscode/vsce
+   ```
+
+2. Package the extension:
+   ```bash
+   cd vscode-extension
+   vsce package
+   ```
+
+3. Install the generated `.vsix` file:
+   ```bash
+   code --install-extension toy-language-0.1.0.vsix
+   ```
+
+4. Reload VSCode and open any `.toy` file to see syntax highlighting in action!
+
 ## Requirements
 
 - **Docker**: Required for assembly and linking (NASM + binutils)
 - **Python 3.10+**: For the compiler itself (uses match/case syntax)
 - **Make**: Optional, for convenient commands
+- **Node.js + npm**: Optional, for building the VSCode extension
 
 The generated assembly targets **Linux x86-64** with direct syscalls, so it must run in a Linux environment (provided by Docker).
