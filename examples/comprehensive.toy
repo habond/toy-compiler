@@ -1,0 +1,83 @@
+// Comprehensive example demonstrating all language features
+// This program combines arithmetic, variables, conditionals, and loops
+
+// Initialize counters
+i = 3;
+total = 0;
+
+// Outer loop
+while i {
+    // Calculate values for this iteration
+    j = 2;
+    sum = 0;
+
+    // Nested inner loop
+    while j {
+        // Arithmetic with operator precedence
+        value = i * j + 10;
+        sum = sum + value;
+
+        // Nested conditional - check if value is even (divisible by 2)
+        // Using remainder approximation: value - (value / 2) * 2
+        remainder = value - value / 2 * 2;
+
+        if remainder {
+            // Odd number
+            print 1;
+        } else {
+            // Even number
+            print 0;
+        }
+
+        j = j - 1;
+    }
+
+    // Conditional based on sum
+    if sum {
+        // Check if sum is greater than 30 (approximation)
+        threshold = 30;
+        diff = sum - threshold;
+
+        if diff {
+            // sum > 30
+            print 999;
+        } else {
+            // sum == 30
+            print 888;
+        }
+    }
+
+    // Update total and counter
+    total = total + sum;
+    i = i - 1;
+}
+
+// Final result
+print total;
+
+// Edge case: loop that doesn't execute
+x = 0;
+while x {
+    print 777;  // Should never print
+}
+
+// Nested conditionals without loops
+a = 5;
+b = 3;
+
+if a {
+    if b {
+        print 42;
+    } else {
+        print 24;
+    }
+} else {
+    print 0;
+}
+
+// Complex arithmetic expression
+result = a * b + a / b - 1;
+print result;
+
+// End marker
+print 9999;
