@@ -34,7 +34,13 @@ else_block: "else" "{" statement* "}"
 
 while_stmt: "while" expr "{" statement* "}"
 
-?expr: comparison
+?expr: logical_or
+
+?logical_or: logical_and
+           | logical_or "||" logical_and  -> or
+
+?logical_and: comparison
+            | logical_and "&&" comparison  -> and
 
 ?comparison: arith
            | comparison "==" arith  -> eq
