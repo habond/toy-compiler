@@ -6,11 +6,12 @@ A simple toy programming language with a lexer/parser built using [Lark](https:/
 
 The language supports:
 
-- **Variables**: Assignment and usage
+- **Subroutines**: Function definitions with parameters, return values, and recursion
+- **Variables**: Assignment and usage (both global and local scope)
 - **Arithmetic**: `+`, `-`, `*`, `/` with proper operator precedence
-- **Comparisons**: `==`, `!=`, `<`, `<=`, `>`, `>=`
+- **Comparisons**: `==`, `!=`, `<`, `<=`, `>`, `>=` (return 1 for true, 0 for false)
 - **Control Flow**: `if` statements with optional `else` blocks, `while` loops
-- **Output**: `print` statement
+- **Output**: `print` statement for displaying integers
 - **Comments**: Single-line comments with `//`
 
 ## Syntax
@@ -79,6 +80,57 @@ while x {
 }
 ```
 
+### Subroutines
+
+```
+// Simple function with parameters and return value
+sub add(a, b) {
+    return a + b;
+}
+
+// Function with local variables
+sub multiply_and_add(x, y, z) {
+    product = x * y;
+    result = product + z;
+    return result;
+}
+
+// Recursive function
+sub factorial(n) {
+    if n <= 1 {
+        return 1;
+    }
+    prev = n - 1;
+    prev_fact = factorial(prev);
+    return n * prev_fact;
+}
+
+// Procedure (void function with implicit return)
+sub print_range(start, end) {
+    current = start;
+    while current <= end {
+        print current;
+        current = current + 1;
+    }
+}
+
+// Calling subroutines
+x = add(10, 20);        // x = 30
+print x;
+
+y = factorial(5);       // y = 120
+print y;
+
+print_range(1, 5);      // Prints: 1 2 3 4 5
+```
+
+**Key Features:**
+- Parameters are passed by value
+- Local variables are scoped to the subroutine
+- Return statements are required (or implicit return at end)
+- Full support for recursion
+- Subroutines can call other subroutines
+
 ## Project Structure
 
 ```
@@ -87,6 +139,7 @@ toy-compiler/
 │   ├── grammar.lark      # Lark grammar definition
 │   ├── ast_nodes.py      # AST node class definitions
 │   ├── ast_walker.py     # AST walker utilities
+│   ├── var_utils.py      # Variable collection utilities
 │   ├── parser.py         # Parser and AST builder
 │   ├── compiler.py       # Compiler (AST -> x86-64 assembly)
 │   └── cli.py            # Command-line interface
@@ -105,8 +158,13 @@ toy-compiler/
 │   ├── loop.expected
 │   ├── comparisons.toy
 │   ├── comparisons.expected
+│   ├── simple_sub.toy
+│   ├── simple_sub.expected
+│   ├── subroutines.toy
+│   ├── subroutines.expected
 │   ├── comprehensive.toy
 │   └── comprehensive.expected
+├── vscode-extension/     # VSCode extension for syntax highlighting
 ├── build/                # Build outputs (assembly, objects, executables)
 ├── Dockerfile            # Docker image for NASM + ld
 ├── compile.sh            # Build script (compile -> assemble -> link -> test)
@@ -314,7 +372,9 @@ The `examples/` directory contains several programs demonstrating language featu
 - **conditional.toy**: If/else statements with truthy/falsy conditions
 - **loop.toy**: While loops including nested loops
 - **comparisons.toy**: All comparison operators (`==`, `!=`, `<`, `<=`, `>`, `>=`)
-- **comprehensive.toy**: Complete feature showcase with nested loops, conditionals, comparisons, and arithmetic
+- **simple_sub.toy**: Basic subroutine with parameters and return value
+- **subroutines.toy**: Advanced subroutine features including recursion, void functions, and nested calls
+- **comprehensive.toy**: Complete feature showcase with subroutines, recursion, nested loops, conditionals, comparisons, and arithmetic
 
 Each example has a corresponding `.expected` file for automated testing.
 
@@ -349,6 +409,49 @@ A VSCode extension is available in the `vscode-extension/` directory providing:
    ```
 
 4. Reload VSCode and open any `.toy` file to see syntax highlighting in action!
+
+## Implementation Notes
+
+### Stack Frame Convention
+
+The compiler uses a standard frame pointer convention for stack management:
+
+**Main Program:**
+```asm
+_start:
+    push rbp          ; Save frame pointer
+    mov rbp, rsp      ; Set up new frame
+    sub rsp, N        ; Allocate space for variables
+    ; ... program code ...
+    mov rsp, rbp      ; Restore stack pointer
+    pop rbp           ; Restore frame pointer
+```
+
+- Variables are stored at **negative offsets** from `rbp`: `rbp-8`, `rbp-16`, `rbp-24`, etc.
+
+**Subroutines:**
+```asm
+subroutine:
+    push rbp          ; Save caller's frame pointer
+    mov rbp, rsp      ; Set up new frame
+    sub rsp, N        ; Allocate space for local variables
+    ; ... subroutine code ...
+    mov rsp, rbp      ; Restore stack pointer
+    pop rbp           ; Restore caller's frame pointer
+    ret
+```
+
+- **Parameters** (pushed by caller): positive offsets from `rbp`: `rbp+16`, `rbp+24`, etc.
+  - `rbp+0`: saved frame pointer
+  - `rbp+8`: return address
+  - `rbp+16`: first parameter
+  - `rbp+24`: second parameter
+- **Local variables**: negative offsets from `rbp`: `rbp-8`, `rbp-16`, etc.
+
+This convention provides:
+- Consistent access to variables via fixed offsets from `rbp`
+- Easy stack cleanup with `mov rsp, rbp`
+- Standard calling convention compatible with common x86-64 practices
 
 ## Requirements
 

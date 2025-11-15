@@ -3,9 +3,10 @@
 
 import argparse
 import sys
+import traceback
 from pathlib import Path
-from parser import Parser
-from compiler import Compiler
+from src.parser import Parser
+from src.compiler import Compiler
 
 
 def compile_file(input_file: str, output_file: str) -> None:
@@ -35,7 +36,10 @@ def compile_file(input_file: str, output_file: str) -> None:
         parser = Parser()
         ast = parser.parse(source)
     except Exception as e:
-        print(f"Parse error: {e}", file=sys.stderr)
+        print(f"Parse error in '{input_file}':", file=sys.stderr)
+        print(f"  {type(e).__name__}: {e}", file=sys.stderr)
+        # Print traceback for detailed debugging
+        traceback.print_exc(file=sys.stderr)
         sys.exit(1)
 
     # Compile
@@ -43,7 +47,10 @@ def compile_file(input_file: str, output_file: str) -> None:
         compiler = Compiler()
         asm = compiler.compile(ast)
     except Exception as e:
-        print(f"Compilation error: {e}", file=sys.stderr)
+        print(f"Compilation error in '{input_file}':", file=sys.stderr)
+        print(f"  {type(e).__name__}: {e}", file=sys.stderr)
+        # Print traceback for detailed debugging
+        traceback.print_exc(file=sys.stderr)
         sys.exit(1)
 
     # Create output directory if needed

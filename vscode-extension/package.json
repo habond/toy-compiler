@@ -2,7 +2,7 @@
   "name": "toy-language",
   "displayName": "Toy Language",
   "description": "Syntax highlighting and language support for the Toy programming language",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "habond",
   "engines": {
     "vscode": "^1.80.0"

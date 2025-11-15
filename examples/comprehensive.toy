@@ -1,5 +1,54 @@
 // Comprehensive example demonstrating all language features
-// This program combines arithmetic, variables, conditionals, and loops
+// This program combines subroutines, arithmetic, variables, conditionals, loops, and comparisons
+
+// ===== Subroutine Definitions =====
+
+// Simple function with return value
+sub add(a, b) {
+    return a + b;
+}
+
+// Function with local variables
+sub multiply_and_add(x, y, z) {
+    product = x * y;
+    result = product + z;
+    return result;
+}
+
+// Recursive function
+sub factorial(n) {
+    if n <= 1 {
+        return 1;
+    }
+    prev = n - 1;
+    prev_fact = factorial(prev);
+    return n * prev_fact;
+}
+
+// Procedure (subroutine without meaningful return - uses implicit return)
+sub print_message(code) {
+    if code == 1 {
+        print 111;
+    }
+    if code == 2 {
+        print 222;
+    }
+}
+
+// ===== Main Program =====
+
+// Test subroutines before main logic
+sum = add(10, 5);
+print sum;  // 15
+
+complex_result = multiply_and_add(3, 4, 2);
+print complex_result;  // 14
+
+fact3 = factorial(3);
+print fact3;  // 6
+
+print_message(1);  // 111
+print_message(2);  // 222
 
 // Initialize counters
 i = 3;
@@ -145,6 +194,19 @@ while counter > 0 {
     print counter;
     counter = counter - 1;
 }
+
+// Test subroutine with comparison operators
+fact4 = factorial(4);
+fact5 = factorial(5);
+if fact5 > fact4 {
+    print fact5;  // 120
+}
+
+// Subroutine call in arithmetic expression
+calc1 = add(5, 10);
+calc2 = add(3, 7);
+combined = calc1 + calc2;
+print combined;  // 25
 
 // End marker
 print 9999;

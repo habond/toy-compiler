@@ -1,0 +1,53 @@
+// Test subroutines with parameters and return values
+
+// Simple addition function
+sub add(a, b) {
+    return a + b;
+}
+
+// Multiplication function
+sub multiply(x, y) {
+    result = x * y;
+    return result;
+}
+
+// Function that uses other functions
+sub calculate(a, b, c) {
+    sum = add(a, b);
+    product = multiply(sum, c);
+    return product;
+}
+
+// Procedure without return value (void)
+sub print_range(start, end) {
+    current = start;
+    while current <= end {
+        print current;
+        current = current + 1;
+    }
+}
+
+// Recursive factorial
+sub factorial(n) {
+    if n <= 1 {
+        return 1;
+    }
+    prev = n - 1;
+    prev_fact = factorial(prev);
+    return n * prev_fact;
+}
+
+// Main program
+x = add(10, 20);
+print x;
+
+y = multiply(5, 6);
+print y;
+
+z = calculate(2, 3, 4);
+print z;
+
+print_range(1, 5);
+
+fact5 = factorial(5);
+print fact5;

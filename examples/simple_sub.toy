@@ -1,0 +1,8 @@
+// Simple subroutine example for testing
+
+sub add(a, b) {
+    return a + b;
+}
+
+result = add(5, 10);
+print result;

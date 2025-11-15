@@ -57,11 +57,38 @@ class WhileLoop(Statement):
 
 
 @dataclass
-class Program(ASTNode):
-    statements: List[Statement]
+class ReturnStmt(Statement):
+    expr: "Expr"
 
     def __str__(self) -> str:
-        return '\n'.join([str(s) for s in self.statements])
+        return f"return {self.expr};"
+
+
+@dataclass
+class CallStmt(Statement):
+    call: "Call"
+
+    def __str__(self) -> str:
+        return f"{self.call};"
+
+
+@dataclass
+class SubroutineDef(ASTNode):
+    name: str
+    params: List[str]
+    body: List[Statement]
+
+    def __str__(self) -> str:
+        params_str = ", ".join(self.params)
+        return f"sub {self.name}({params_str})"
+
+
+@dataclass
+class Program(ASTNode):
+    top_level: List[ASTNode]  # Can be SubroutineDef or Statement
+
+    def __str__(self) -> str:
+        return '\n'.join([str(item) for item in self.top_level])
 
 
 # Expressions
@@ -96,3 +123,13 @@ class BinOp(Expr):
 
     def __str__(self) -> str:
         return f"({self.left} {self.op} {self.right})"
+
+
+@dataclass
+class Call(Expr):
+    name: str
+    args: List[Expr]
+
+    def __str__(self) -> str:
+        args_str = ", ".join([str(arg) for arg in self.args])
+        return f"{self.name}({args_str})"

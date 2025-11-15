@@ -2,6 +2,16 @@
 
 All notable changes to the "toy-language" extension will be documented in this file.
 
+## [0.2.0] - 2025-01-14
+
+### Added
+- Subroutine support:
+  - `sub` keyword for subroutine definitions
+  - `return` keyword for return statements
+  - Function name highlighting in definitions and calls
+  - Comma separator for parameter and argument lists
+- Enhanced syntax highlighting for function calls with proper scoping
+
 ## [0.1.0] - 2025-01-14
 
 ### Added

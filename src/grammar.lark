@@ -1,15 +1,30 @@
 // Simple toy language grammar
 
-?start: statement+
+?start: top_level+
+
+?top_level: subroutine_def
+          | statement
 
 ?statement: assignment
           | print_stmt
           | if_stmt
           | while_stmt
+          | return_stmt
+          | call_stmt
+
+subroutine_def: "sub" NAME param_list sub_body
+
+param_list: "(" (NAME ("," NAME)*)? ")"
+
+sub_body: "{" statement* "}"
 
 assignment: NAME "=" expr ";"
 
 print_stmt: "print" expr ";"
+
+return_stmt: "return" expr ";"
+
+call_stmt: NAME arg_list ";"
 
 if_stmt: "if" expr then_block else_block?
 
@@ -41,7 +56,10 @@ while_stmt: "while" expr "{" statement* "}"
        | "(" expr ")"
 
 ?atom: NUMBER           -> number
+     | NAME arg_list    -> call
      | NAME             -> var
+
+arg_list: "(" (expr ("," expr)*)? ")"
 
 NAME: /[a-zA-Z_][a-zA-Z0-9_]*/
 NUMBER: /[0-9]+/

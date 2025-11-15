@@ -49,7 +49,7 @@ OBJ_FILE="build/${OUTPUT_NAME}.o"
 EXEC_FILE="build/${OUTPUT_NAME}"
 
 echo "==> Step 1: Compiling toy source to assembly..."
-python3 src/cli.py "$SOURCE_FILE" "$ASM_FILE"
+python3 -m src.cli "$SOURCE_FILE" "$ASM_FILE"
 
 echo "==> Step 2: Assembling with NASM..."
 nasm -f elf64 "$ASM_FILE" -o "$OBJ_FILE"

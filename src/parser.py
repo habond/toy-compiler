@@ -1,29 +1,29 @@
 """Parser for the toy language using Lark."""
 
 from pathlib import Path
-from lark import Lark, Transformer
-from ast_nodes import *
+from lark import Lark, Transformer, v_args
+from src.ast_nodes import *
 
 
 class ASTBuilder(Transformer):
     """Transforms Lark parse tree into our custom AST."""
 
     def start(self, items):
-        return Program(statements=items)
+        return Program(top_level=items)
 
     # Statements
-    def assignment(self, items):
-        name = str(items[0])
-        value = items[1]
-        return Assignment(name=name, value=value)
+    @v_args(inline=True)
+    def assignment(self, name, value):
+        return Assignment(name=str(name), value=value)
 
-    def print_stmt(self, items):
-        return Print(expr=items[0])
+    @v_args(inline=True)
+    def print_stmt(self, expr):
+        return Print(expr=expr)
 
     def if_stmt(self, items):
         condition = items[0]
-        then_body = items[1]  # This will be from then_block
-        else_body = items[2] if len(items) > 2 else None  # This will be from else_block if present
+        then_body = items[1]
+        else_body = items[2] if len(items) > 2 else None
         return IfStmt(condition=condition, then_body=then_body, else_body=else_body)
 
     def then_block(self, items):
@@ -32,49 +32,86 @@ class ASTBuilder(Transformer):
     def else_block(self, items):
         return list(items)
 
-    def while_stmt(self, items):
-        condition = items[0]
-        body = list(items[1:])
-        return WhileLoop(condition=condition, body=body)
+    @v_args(inline=True)
+    def while_stmt(self, condition, *body):
+        return WhileLoop(condition=condition, body=list(body))
+
+    @v_args(inline=True)
+    def return_stmt(self, expr):
+        return ReturnStmt(expr=expr)
+
+    @v_args(inline=True)
+    def call_stmt(self, name, args):
+        # Wrap the Call expression in a CallStmt statement
+        return CallStmt(call=Call(name=str(name), args=args))
+
+    @v_args(inline=True)
+    def subroutine_def(self, name, params, body):
+        return SubroutineDef(name=str(name), params=params, body=body)
+
+    def param_list(self, items):
+        return [str(name) for name in items]
+
+    def sub_body(self, items):
+        return list(items)
+
+    def arg_list(self, items):
+        return list(items)
 
     # Expressions
-    def number(self, items):
-        return Number(value=int(items[0]))
+    @v_args(inline=True)
+    def number(self, value):
+        return Number(value=int(value))
 
-    def var(self, items):
-        return Var(name=str(items[0]))
+    @v_args(inline=True)
+    def var(self, name):
+        return Var(name=str(name))
+
+    @v_args(inline=True)
+    def call(self, name, args):
+        return Call(name=str(name), args=args)
 
     # Binary operations - Arithmetic
-    def add(self, items):
-        return BinOp(op="+", left=items[0], right=items[1])
+    @v_args(inline=True)
+    def add(self, left, right):
+        return BinOp(op="+", left=left, right=right)
 
-    def sub(self, items):
-        return BinOp(op="-", left=items[0], right=items[1])
+    @v_args(inline=True)
+    def sub(self, left, right):
+        return BinOp(op="-", left=left, right=right)
 
-    def mul(self, items):
-        return BinOp(op="*", left=items[0], right=items[1])
+    @v_args(inline=True)
+    def mul(self, left, right):
+        return BinOp(op="*", left=left, right=right)
 
-    def div(self, items):
-        return BinOp(op="/", left=items[0], right=items[1])
+    @v_args(inline=True)
+    def div(self, left, right):
+        return BinOp(op="/", left=left, right=right)
 
     # Binary operations - Comparisons
-    def eq(self, items):
-        return BinOp(op="==", left=items[0], right=items[1])
+    @v_args(inline=True)
+    def eq(self, left, right):
+        return BinOp(op="==", left=left, right=right)
 
-    def ne(self, items):
-        return BinOp(op="!=", left=items[0], right=items[1])
+    @v_args(inline=True)
+    def ne(self, left, right):
+        return BinOp(op="!=", left=left, right=right)
 
-    def lt(self, items):
-        return BinOp(op="<", left=items[0], right=items[1])
+    @v_args(inline=True)
+    def lt(self, left, right):
+        return BinOp(op="<", left=left, right=right)
 
-    def le(self, items):
-        return BinOp(op="<=", left=items[0], right=items[1])
+    @v_args(inline=True)
+    def le(self, left, right):
+        return BinOp(op="<=", left=left, right=right)
 
-    def gt(self, items):
-        return BinOp(op=">", left=items[0], right=items[1])
+    @v_args(inline=True)
+    def gt(self, left, right):
+        return BinOp(op=">", left=left, right=right)
 
-    def ge(self, items):
-        return BinOp(op=">=", left=items[0], right=items[1])
+    @v_args(inline=True)
+    def ge(self, left, right):
+        return BinOp(op=">=", left=left, right=right)
 
 
 class Parser:
