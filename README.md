@@ -441,12 +441,19 @@ subroutine:
     ret
 ```
 
-- **Parameters** (pushed by caller): positive offsets from `rbp`: `rbp+16`, `rbp+24`, etc.
-  - `rbp+0`: saved frame pointer
-  - `rbp+8`: return address
+Stack layout for subroutines (from high to low addresses):
+- **Parameters** (pushed by caller, positive offsets from `rbp`):
+  - `rbp+32`: third parameter (if exists)
+  - `rbp+24`: second parameter (if exists)
   - `rbp+16`: first parameter
-  - `rbp+24`: second parameter
-- **Local variables**: negative offsets from `rbp`: `rbp-8`, `rbp-16`, etc.
+- **Call frame** (created automatically by call/prologue):
+  - `rbp+8`: return address (pushed by `call` instruction)
+  - `rbp+0`: saved caller's rbp (pushed by `push rbp` in prologue)
+- **Local variables** (allocated by subroutine, negative offsets from `rbp`):
+  - `rbp-8`: first local variable
+  - `rbp-16`: second local variable
+  - `rbp-24`: third local variable
+  - etc.
 
 This convention provides:
 - Consistent access to variables via fixed offsets from `rbp`
