@@ -378,18 +378,15 @@ class Compiler:
 
         # Show parameters (positive offsets)
         if params:
-            self.emit("; Parameters:")
             for var, offset in sorted([(v, o) for v, o in param_offsets.items()], key=lambda x: -x[1]):
                 self.emit(f";   [rbp{offset:+d}] = {var}")
 
         # Show call frame (fixed locations)
-        self.emit("; Call frame:")
         self.emit(";   [rbp+8] = return address (pushed by CALL)")
         self.emit(";   [rbp+0] = saved caller's rbp")
 
         # Show local variables (negative offsets)
         if body_vars:
-            self.emit("; Local variables:")
             for var, offset in sorted([(v, o) for v, o in local_offsets.items()], key=lambda x: -x[1]):
                 self.emit(f";   [rbp{offset:+d}] = {var}")
 
