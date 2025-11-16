@@ -2,6 +2,34 @@
 
 from dataclasses import dataclass
 from typing import List, Optional
+from enum import Enum
+
+
+class BinOpType(Enum):
+    """Binary operator types."""
+    # Arithmetic operators
+    ADD = "+"
+    SUB = "-"
+    MUL = "*"
+    DIV = "/"
+
+    # Comparison operators
+    EQ = "=="
+    NE = "!="
+    LT = "<"
+    LE = "<="
+    GT = ">"
+    GE = ">="
+
+    # Logical operators (short-circuit evaluation)
+    AND = "&&"
+    OR = "||"
+
+
+class UnaryOpType(Enum):
+    """Unary operator types."""
+    NEGATE = "-"   # Arithmetic negation
+    NOT = "!"      # Logical NOT
 
 
 @dataclass
@@ -117,12 +145,36 @@ class Var(Expr):
 
 @dataclass
 class BinOp(Expr):
-    op: str
+    """Binary operation expression.
+
+    Supports arithmetic (+, -, *, /), comparison (==, !=, <, <=, >, >=),
+    and logical operators (&&, ||).
+
+    Note: Logical operators (&&, ||) use short-circuit evaluation:
+    - &&: If left is false (0), returns 0 without evaluating right
+    - ||: If left is true (non-zero), returns 1 without evaluating right
+    """
+    op: BinOpType
     left: Expr
     right: Expr
 
     def __str__(self) -> str:
-        return f"({self.left} {self.op} {self.right})"
+        return f"({self.left} {self.op.value} {self.right})"
+
+
+@dataclass
+class UnaryOp(Expr):
+    """Unary operation expression.
+
+    Supports:
+    - Arithmetic negation (-): Returns the negative of the operand
+    - Logical NOT (!): Returns 1 if operand is 0, otherwise returns 0
+    """
+    op: UnaryOpType
+    operand: Expr
+
+    def __str__(self) -> str:
+        return f"({self.op.value}{self.operand})"
 
 
 @dataclass

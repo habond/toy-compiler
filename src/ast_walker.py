@@ -72,6 +72,9 @@ def walk(node: ASTNode, skip: list[type[ASTNode]] = []) -> Iterator[ASTNode]:
             yield from walk(left, skip)
             yield from walk(right, skip)
 
+        case UnaryOp(operand=operand):
+            yield from walk(operand, skip)
+
         case Call(args=args):
             for arg in args:
                 yield from walk(arg, skip)

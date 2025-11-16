@@ -37,10 +37,10 @@ while_stmt: "while" expr "{" statement* "}"
 ?expr: logical_or
 
 ?logical_or: logical_and
-           | logical_or "||" logical_and  -> or
+           | logical_or "||" logical_and  -> or_op
 
 ?logical_and: comparison
-            | logical_and "&&" comparison  -> and
+            | logical_and "&&" comparison  -> and_op
 
 ?comparison: arith
            | comparison "==" arith  -> eq
@@ -54,16 +54,18 @@ while_stmt: "while" expr "{" statement* "}"
       | arith "+" term   -> add
       | arith "-" term   -> sub
 
-?term: factor
-     | term "*" factor  -> mul
-     | term "/" factor  -> div
+?term: unary
+     | term "*" unary  -> mul
+     | term "/" unary  -> div
 
-?factor: atom
-       | "(" expr ")"
+?unary: atom
+      | "-" unary  -> negate
+      | "!" unary  -> not_op
 
 ?atom: NUMBER           -> number
      | NAME arg_list    -> call
      | NAME             -> var
+     | "(" expr ")"
 
 arg_list: "(" (expr ("," expr)*)? ")"
 

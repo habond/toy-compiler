@@ -1,0 +1,152 @@
+// Test unary operators (negation and logical NOT)
+
+// ===== Arithmetic Negation (-) =====
+
+// Negate literal
+x = -5;
+print x;
+
+// Negate positive variable
+a = 10;
+b = -a;
+print b;
+
+// Double negation
+c = --5;
+print c;
+
+// Negation in expression
+result = -5 + 3;
+print result;
+
+// Negation with multiplication
+result = -2 * 3;
+print result;
+
+// Negate function result
+sub get_value() {
+    return 7;
+}
+
+negated = -get_value();
+print negated;
+
+// ===== Logical NOT (!) =====
+
+// NOT on false (0)
+x = !0;
+print x;
+
+// NOT on true (non-zero)
+y = !1;
+print y;
+
+z = !5;
+print z;
+
+// Double NOT
+w = !!1;
+print w;
+
+// NOT with comparisons
+result = !(5 > 10);
+print result;
+
+result = !(3 == 3);
+print result;
+
+// NOT in conditionals
+flag = 0;
+if !flag {
+    print 100;
+}
+
+flag = 1;
+if !flag {
+    print 200;  // Should not print
+}
+
+// ===== Combining Unary with Boolean Operators =====
+
+// NOT with AND
+result = !0 && !0;
+print result;
+
+result = !1 && !0;
+print result;
+
+// NOT with OR
+result = !0 || !1;
+print result;
+
+result = !1 || !1;
+print result;
+
+// Complex: NOT of compound expression
+a = 5;
+b = 10;
+result = !(a > b);
+print result;
+
+result = !(a < b);
+print result;
+
+// NOT in while loop
+counter = 0;
+while !counter {
+    print 999;
+    counter = 1;  // Exit after one iteration
+}
+
+// ===== Combining Negation with Arithmetic =====
+
+// Negation with addition/subtraction
+result = -5 + -3;
+print result;
+
+result = -10 - -5;
+print result;
+
+// Negation in comparison
+x = -5;
+y = -3;
+result = x < y;
+print result;
+
+// Complex expression
+result = -2 * 3 + -4;
+print result;
+
+// ===== Edge Cases =====
+
+// Negation of zero
+zero = 0;
+result = -zero;
+print result;
+
+// NOT of zero (should be 1)
+result = !zero;
+print result;
+
+// Chained negations
+result = ---5;
+print result;
+
+// Chained NOTs
+result = !!!0;
+print result;
+
+// Negation and NOT together
+result = -!5;  // !5 = 0, -0 = 0
+print result;
+
+result = !-5;  // -5 = -5 (truthy), !-5 = 0
+print result;
+
+// Final test: all together
+x = 10;
+if !(x < 0) && x > 5 {
+    print 777;
+}
+
+print 9999;

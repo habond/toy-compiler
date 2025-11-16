@@ -9,7 +9,9 @@ The language supports:
 - **Subroutines**: Function definitions with parameters, return values, and recursion
 - **Variables**: Assignment and usage (both global and local scope)
 - **Arithmetic**: `+`, `-`, `*`, `/` with proper operator precedence
+- **Unary Operators**: `-` (negation), `!` (logical NOT)
 - **Comparisons**: `==`, `!=`, `<`, `<=`, `>`, `>=` (return 1 for true, 0 for false)
+- **Boolean Logic**: `&&` (AND), `||` (OR) with short-circuit evaluation
 - **Control Flow**: `if` statements with optional `else` blocks, `while` loops
 - **Output**: `print` statement for displaying integers
 - **Comments**: Single-line comments with `//`
@@ -29,6 +31,23 @@ y = 20;
 z = x + y * 2;  // Supports operator precedence
 ```
 
+### Unary Operators
+```
+// Arithmetic negation
+x = -5;
+y = -x;         // y = 5
+z = -(2 + 3);   // z = -5
+
+// Logical NOT
+flag = !0;      // flag = 1 (true)
+result = !5;    // result = 0 (false, any non-zero is truthy)
+result = !!1;   // result = 1 (double negation)
+
+// Combining unary operators
+x = -!5;        // !5 = 0, -0 = 0
+y = !-3;        // -3 is truthy, !-3 = 0
+```
+
 ### Comparisons
 ```
 // All comparison operators return 1 (true) or 0 (false)
@@ -41,6 +60,35 @@ result = x >= y;   // Greater than or equal
 
 // Comparisons work with expressions
 result = x + 1 < y * 2;
+```
+
+### Boolean Operators
+```
+// Logical AND (&&) - short-circuit evaluation
+result = 1 && 1;           // 1 (true)
+result = 1 && 0;           // 0 (false)
+result = 0 && anything;    // 0 (right side not evaluated)
+
+// Logical OR (||) - short-circuit evaluation
+result = 1 || 0;           // 1 (true)
+result = 0 || 1;           // 1 (true)
+result = 1 || anything;    // 1 (right side not evaluated)
+
+// Combining with comparisons
+age = 25;
+can_drive = age >= 18 && has_license == 1;
+
+// Range checking
+val = 7;
+in_range = val > 0 && val < 10;
+
+// Complex expressions
+result = x > 0 && y > 0 || z == 1;
+
+// With NOT operator
+if !(x < 0) && x < 100 {
+    print x;
+}
 ```
 
 ### Conditionals
@@ -371,9 +419,11 @@ The `examples/` directory contains several programs demonstrating language featu
 - **conditional.toy**: If/else statements with truthy/falsy conditions
 - **loop.toy**: While loops including nested loops
 - **comparisons.toy**: All comparison operators (`==`, `!=`, `<`, `<=`, `>`, `>=`)
+- **boolean_ops.toy**: Boolean operators (`&&`, `||`) with short-circuit evaluation
+- **unary.toy**: Unary operators (negation `-`, logical NOT `!`)
 - **simple_sub.toy**: Basic subroutine with parameters and return value
 - **subroutines.toy**: Advanced subroutine features including recursion, void functions, and nested calls
-- **comprehensive.toy**: Complete feature showcase with subroutines, recursion, nested loops, conditionals, comparisons, and arithmetic
+- **comprehensive.toy**: Complete feature showcase including all operators, subroutines, recursion, nested loops, conditionals, and control flow
 
 Each example has a corresponding `.expected` file for automated testing.
 

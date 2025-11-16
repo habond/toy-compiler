@@ -208,5 +208,77 @@ calc2 = add(3, 7);
 combined = calc1 + calc2;
 print combined;  // 25
 
+// ===== Boolean Operators (AND, OR) =====
+
+// Basic AND tests
+result = 1 && 1;
+print result;  // 1
+
+result = 1 && 0;
+print result;  // 0
+
+result = 0 && 1;
+print result;  // 0
+
+// Basic OR tests
+result = 1 || 0;
+print result;  // 1
+
+result = 0 || 1;
+print result;  // 1
+
+result = 0 || 0;
+print result;  // 0
+
+// Boolean operators with comparisons
+age = 25;
+has_license = 1;
+can_drive = age >= 18 && has_license == 1;
+print can_drive;  // 1
+
+min_age = 16;
+max_age = 65;
+valid_age = age >= min_age && age <= max_age;
+print valid_age;  // 1
+
+// OR with comparisons
+weekend = 0;
+vacation = 1;
+can_relax = weekend == 1 || vacation == 1;
+print can_relax;  // 1
+
+// Complex boolean expression
+// (5 > 3 && 10 < 20) || 0 == 1
+result = 5 > 3 && 10 < 20 || 0 == 1;
+print result;  // 1
+
+// Range checking with boolean operators
+val = 7;
+in_range = val > 0 && val < 10;
+print in_range;  // 1
+
+val2 = 15;
+out_of_range = val2 < 0 || val2 > 100;
+print out_of_range;  // 0
+
+// Boolean operators in conditionals
+x = 5;
+y = 10;
+if x > 0 && y > 0 {
+    print 555;
+}
+
+if x < 0 || y > 5 {
+    print 666;
+}
+
+// Boolean operators in while loop
+counter = 3;
+limit = 5;
+while counter > 0 && counter < limit {
+    print counter;
+    counter = counter + 1;
+}
+
 // End marker
 print 9999;

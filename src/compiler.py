@@ -60,6 +60,36 @@ ASM_PUSH_NUMBER = "push qword {num}"
 
 ASM_PUSH_VAR = "push qword [rbp{offset:+d}]"
 
+ASM_UNARYOP_NOT = """
+pop rax          ; Operand
+test rax, rax    ; Set flags based on rax
+sete al          ; Set al to 1 if rax was 0, else 0
+movzx rax, al    ; Zero-extend al to rax
+push qword rax   ; Push result
+"""
+
+ASM_UNARYOP_NEG = """
+pop rax          ; Operand
+neg rax          ; rax = -rax
+push qword rax   ; Push result
+"""
+
+ASM_BINOP_AND = """
+; Logical and operation
+pop rbx             ; Second operand
+pop rax             ; First operand
+and rax, rbx        ; rax = rax && rbx
+push qword rax      ; Push result
+"""
+
+ASM_BINOP_OR = """
+; Logical and operation
+pop rbx             ; Second operand
+pop rax             ; First operand
+or rax, rbx        ; rax = rax || rbx
+push qword rax      ; Push result
+"""
+
 ASM_BINOP_ADD = """
 ; Addition operation
 pop rbx             ; Second operand
@@ -145,12 +175,12 @@ PARAM_OFFSET_START = 2  # Parameter indexing starts at 2 qwords (16 bytes) above
 # Mapping from comparison operators to x86 condition codes
 # These are used with the SETcc instruction to convert comparison results to boolean values
 COMPARISON_CONDITIONS = {
-    '<=': 'le',  # Less than or Equal (signed)
-    '<': 'l',    # Less than (signed)
-    '==': 'e',   # Equal
-    '!=': 'ne',  # Not Equal
-    '>': 'g',    # Greater than (signed)
-    '>=': 'ge'   # Greater than or Equal (signed)
+    BinOpType.LE: 'le',  # Less than or Equal (signed)
+    BinOpType.LT: 'l',   # Less than (signed)
+    BinOpType.EQ: 'e',   # Equal
+    BinOpType.NE: 'ne',  # Not Equal
+    BinOpType.GT: 'g',   # Greater than (signed)
+    BinOpType.GE: 'ge'   # Greater than or Equal (signed)
 }
 
 @dataclass
@@ -530,6 +560,15 @@ class Compiler:
             ValueError: If an unknown expression or operator type is encountered.
         """
         match expr:
+            case UnaryOp(op, operand):
+                match op:
+                    case UnaryOpType.NOT:
+                        self.expr(operand)
+                        self.emit(ASM_UNARYOP_NOT)
+                    case UnaryOpType.NEGATE:
+                        self.expr(operand)
+                        self.emit(ASM_UNARYOP_NEG)
+
             case Number(num):
                 # Push literal number onto stack
                 self.emit(ASM_PUSH_NUMBER.format(num=num))
@@ -547,19 +586,23 @@ class Compiler:
 
                 # Apply operator: pops operands, pushes result
                 match op:
-                    case '+':
+                    case BinOpType.AND:
+                        self.emit(ASM_BINOP_AND)
+                    case BinOpType.OR:
+                        self.emit(ASM_BINOP_OR)
+                    case BinOpType.ADD:
                         self.emit(ASM_BINOP_ADD)
-                    case '-':
+                    case BinOpType.SUB:
                         self.emit(ASM_BINOP_SUB)
-                    case '*':
+                    case BinOpType.MUL:
                         self.emit(ASM_BINOP_MUL)
-                    case '/':
+                    case BinOpType.DIV:
                         self.emit(ASM_BINOP_DIV)
                     case _ if op in COMPARISON_CONDITIONS:
                         # Comparison operators produce boolean results (0 or 1)
                         self.emit(ASM_BINOP_CMP.format(condition=COMPARISON_CONDITIONS[op]))
-                    case other:
-                        raise ValueError(f"Unexpected operator '{other}'")
+                    case _:
+                        raise ValueError(f"Unexpected operator '{op}'")
 
             case Call(name, args):
                 # Push arguments in reverse order (rightmost first)
