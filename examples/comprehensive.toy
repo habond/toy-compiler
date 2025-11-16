@@ -1,284 +1,217 @@
 // Comprehensive example demonstrating all language features
-// This program combines subroutines, arithmetic, variables, conditionals, loops, and comparisons
+// This program integrates subroutines, operators, control flow, and recursion
 
-// ===== Subroutine Definitions =====
+// ===== Utility Subroutines =====
 
-// Simple function with return value
-sub add(a, b) {
-    return a + b;
+// Calculate absolute value using negation
+sub abs(n) {
+    if n < 0 {
+        return -n;
+    }
+    return n;
 }
 
-// Function with local variables
-sub multiply_and_add(x, y, z) {
-    product = x * y;
-    result = product + z;
-    return result;
+// Check if value is in range using boolean operators
+sub in_range(val, min, max) {
+    return val >= min && val <= max;
 }
 
-// Recursive function
+// Calculate factorial recursively
 sub factorial(n) {
     if n <= 1 {
         return 1;
     }
-    prev = n - 1;
-    prev_fact = factorial(prev);
-    return n * prev_fact;
+    return n * factorial(n - 1);
 }
 
-// Procedure (subroutine without meaningful return - uses implicit return)
-sub print_message(code) {
-    if code == 1 {
-        print 111;
+// Check if number is even (returns 1 for even, 0 for odd)
+sub is_even(n) {
+    remainder = n - n / 2 * 2;
+    return !remainder;  // NOT: converts 0 to 1, non-zero to 0
+}
+
+// Safe division with negation handling
+sub safe_divide(dividend, divisor) {
+    if divisor == 0 {
+        return 0;
     }
-    if code == 2 {
-        print 222;
-    }
+    result = dividend / divisor;
+    return result;
 }
 
 // ===== Main Program =====
 
-// Test subroutines before main logic
-sum = add(10, 5);
-print sum;  // 15
+// Test absolute value with negative numbers
+x = -15;
+abs_x = abs(x);
+print abs_x;  // 15
 
-complex_result = multiply_and_add(3, 4, 2);
-print complex_result;  // 14
+y = 10;
+abs_y = abs(y);
+print abs_y;  // 10
 
-fact3 = factorial(3);
-print fact3;  // 6
+// Range checking with boolean operators
+age = 25;
+min_age = 18;
+max_age = 65;
 
-print_message(1);  // 111
-print_message(2);  // 222
-
-// Initialize counters
-i = 3;
-total = 0;
-
-// Outer loop
-while i {
-    // Calculate values for this iteration
-    j = 2;
-    sum = 0;
-
-    // Nested inner loop
-    while j {
-        // Arithmetic with operator precedence
-        value = i * j + 10;
-        sum = sum + value;
-
-        // Nested conditional - check if value is even (divisible by 2)
-        // Using remainder approximation: value - (value / 2) * 2
-        remainder = value - value / 2 * 2;
-
-        if remainder {
-            // Odd number
-            print 1;
-        } else {
-            // Even number
-            print 0;
-        }
-
-        j = j - 1;
-    }
-
-    // Conditional based on sum
-    if sum {
-        // Check if sum is greater than 30 (approximation)
-        threshold = 30;
-        diff = sum - threshold;
-
-        if diff {
-            // sum > 30
-            print 999;
-        } else {
-            // sum == 30
-            print 888;
-        }
-    }
-
-    // Update total and counter
-    total = total + sum;
-    i = i - 1;
-}
-
-// Final result
-print total;
-
-// Edge case: loop that doesn't execute
-x = 0;
-while x {
-    print 777;  // Should never print
-}
-
-// Nested conditionals without loops
-a = 5;
-b = 3;
-
-if a {
-    if b {
-        print 42;
-    } else {
-        print 24;
-    }
+if in_range(age, min_age, max_age) {
+    print 1;  // In range
 } else {
     print 0;
 }
 
-// Complex arithmetic expression
-result = a * b + a / b - 1;
-print result;
+// Complex expression with unary and binary operators
+val = -5 + 3 * 2;  // -5 + 6 = 1
+print val;
 
-// Test comparison operators
-c = 10;
-d = 5;
-
-// Equality comparisons
-result = c == d;
-print result;  // 0 (false)
-
-result = c != d;
-print result;  // 1 (true)
-
-result = d == 5;
-print result;  // 1 (true)
-
-// Less than comparisons
-result = d < c;
-print result;  // 1 (true)
-
-result = c < d;
-print result;  // 0 (false)
-
-// Greater than comparisons
-result = c > d;
-print result;  // 1 (true)
-
-result = d > c;
-print result;  // 0 (false)
-
-// Less than or equal
-result = d <= 5;
-print result;  // 1 (true)
-
-result = c <= d;
-print result;  // 0 (false)
-
-// Greater than or equal
-result = c >= 10;
-print result;  // 1 (true)
-
-result = d >= c;
-print result;  // 0 (false)
-
-// Comparisons in conditionals
-if c > d {
-    print 100;
+// NOT operator in conditional
+has_error = 0;
+if !has_error {
+    print 100;  // No error
 }
 
-if d == 5 {
+// Factorial with comparison
+fact3 = factorial(3);
+fact4 = factorial(4);
+print fact3;  // 6
+print fact4;  // 24
+
+if fact4 > fact3 {
     print 200;
-} else {
-    print 300;
 }
 
-// Comparisons with arithmetic
-result = c + 5 > d * 2;
-print result;  // 15 > 10 = 1 (true)
-
-result = c - 5 == d;
-print result;  // 5 == 5 = 1 (true)
-
-// Comparison in while loop
-counter = 3;
+// Even/odd checking with loops and NOT
+counter = 5;
 while counter > 0 {
-    print counter;
+    if is_even(counter) {
+        print counter;  // Print even numbers: 4, 2
+    }
     counter = counter - 1;
 }
 
-// Test subroutine with comparison operators
-fact4 = factorial(4);
-fact5 = factorial(5);
-if fact5 > fact4 {
-    print fact5;  // 120
+// Boolean logic with AND/OR
+x = 10;
+y = 20;
+
+// Range check using AND
+if x > 0 && x < 100 && y > 0 && y < 100 {
+    print 300;
 }
 
-// Subroutine call in arithmetic expression
-calc1 = add(5, 10);
-calc2 = add(3, 7);
-combined = calc1 + calc2;
-print combined;  // 25
-
-// ===== Boolean Operators (AND, OR) =====
-
-// Basic AND tests
-result = 1 && 1;
-print result;  // 1
-
-result = 1 && 0;
-print result;  // 0
-
-result = 0 && 1;
-print result;  // 0
-
-// Basic OR tests
-result = 1 || 0;
-print result;  // 1
-
-result = 0 || 1;
-print result;  // 1
-
-result = 0 || 0;
-print result;  // 0
-
-// Boolean operators with comparisons
-age = 25;
-has_license = 1;
-can_drive = age >= 18 && has_license == 1;
-print can_drive;  // 1
-
-min_age = 16;
-max_age = 65;
-valid_age = age >= min_age && age <= max_age;
-print valid_age;  // 1
-
-// OR with comparisons
+// Multiple conditions with OR
 weekend = 0;
 vacation = 1;
-can_relax = weekend == 1 || vacation == 1;
-print can_relax;  // 1
+sick = 0;
 
-// Complex boolean expression
-// (5 > 3 && 10 < 20) || 0 == 1
-result = 5 > 3 && 10 < 20 || 0 == 1;
+can_rest = weekend == 1 || vacation == 1 || sick == 1;
+if can_rest {
+    print 400;
+}
+
+// Nested conditionals with NOT and comparisons
+score = 85;
+passing = 60;
+
+if !(score < passing) {  // NOT (score < passing) = score >= passing
+    if score >= 90 {
+        print 500;  // A
+    } else {
+        if score >= 80 {
+            print 501;  // B
+        } else {
+            print 502;  // C
+        }
+    }
+} else {
+    print 503;  // Fail
+}
+
+// Nested loops with boolean operators and negation
+i = 3;
+total = 0;
+
+while i > 0 && i <= 5 {
+    j = 2;
+    sum = 0;
+
+    while j > 0 {
+        // Use negation in calculation
+        value = -(i * -j);  // Simplifies to i * j
+        sum = sum + value;
+        j = j - 1;
+    }
+
+    total = total + sum;
+    i = i + 1;
+}
+
+print total;  // Sum of all i*j for i in [3,4,5], j in [1,2]
+
+// Safe division with error checking
+numerator = 100;
+denominator = 5;
+
+result = safe_divide(numerator, denominator);
+print result;  // 20
+
+// Division by zero test
+bad_result = safe_divide(10, 0);
+print bad_result;  // 0 (safe default)
+
+// Complex boolean expression with short-circuit
+a = 5;
+b = 10;
+c = 15;
+
+// (a < b AND b < c) OR a == 0
+if a < b && b < c || a == 0 {
+    print 600;
+}
+
+// Double negation
+flag = 5;
+result = !!flag;  // Any non-zero becomes 1
 print result;  // 1
 
-// Range checking with boolean operators
-val = 7;
-in_range = val > 0 && val < 10;
-print in_range;  // 1
+// Using NOT with AND
+enabled = 1;
+locked = 0;
 
-val2 = 15;
-out_of_range = val2 < 0 || val2 > 100;
-print out_of_range;  // 0
+if enabled == 1 && !locked {
+    print 700;
+}
 
-// Boolean operators in conditionals
+// Arithmetic with multiple negations
 x = 5;
-y = 10;
-if x > 0 && y > 0 {
-    print 555;
+y = -3;
+z = -x + -y;  // -5 + 3 = -2
+print z;
+
+// Comparison with negated values
+if -10 < -5 {
+    print 800;
 }
 
-if x < 0 || y > 5 {
-    print 666;
+// While loop with NOT condition
+done = 0;
+count = 0;
+while !done {
+    count = count + 1;
+    if count >= 3 {
+        done = 1;
+    }
+    print count;
 }
 
-// Boolean operators in while loop
-counter = 3;
-limit = 5;
-while counter > 0 && counter < limit {
-    print counter;
-    counter = counter + 1;
+// Subroutine calls in boolean expressions
+if factorial(3) == 6 && abs(-10) == 10 {
+    print 900;
 }
+
+// Final complex calculation
+final = factorial(4) / 4 + abs(-5) - -2;  // 24/4 + 5 + 2 = 13
+print final;
 
 // End marker
 print 9999;
