@@ -328,12 +328,12 @@ x = 42;
 println x;
 """
 
-# Parse to AST
-ast = parser.parse(code)
+# Parse to AST (optionally pass filename for location tracking)
+ast = parser.parse(code, filename="example.toy")
 
 # AST nodes are pure data classes - use default repr for debugging
 print("AST structure:", ast)
-# Output: Program(top_level=[Assignment(name='x', value=Number(value=42)), ...])
+# Output: Program(top_level=[Assignment(name='x', value=Number(value=42, location=...), location=...), ...])
 
 # Convert AST back to source code using CodePrinter
 source = printer.print(ast)
@@ -555,7 +555,10 @@ print(printer.print(ast))
 # println x;
 
 # Use locations for enhanced error messages
-def find_undefined_vars(ast):
+from src.ast_walker import walk
+from src.ast_nodes import Var
+
+def find_undefined_vars(ast, defined_vars):
     for node in walk(ast):
         if isinstance(node, Var) and node.name not in defined_vars:
             print(f"Error at {node.location}: Undefined variable '{node.name}'")
