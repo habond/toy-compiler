@@ -11,6 +11,8 @@
           | while_stmt
           | return_stmt
           | call_stmt
+          | break_stmt
+          | continue_stmt
 
 subroutine_def: "sub" NAME param_list sub_body
 
@@ -25,6 +27,10 @@ print_stmt: "print" expr ";"
 return_stmt: "return" expr ";"
 
 call_stmt: NAME arg_list ";"
+
+break_stmt: "break" ";"
+
+continue_stmt: "continue" ";"
 
 if_stmt: "if" expr then_block else_block?
 

@@ -5,8 +5,9 @@ import argparse
 import sys
 import traceback
 from pathlib import Path
-from src.parser import Parser
+
 from src.compiler import Compiler
+from src.parser import Parser
 
 
 def compile_file(input_file: str, output_file: str) -> None:
@@ -74,18 +75,12 @@ def main():
 Examples:
   %(prog)s input.toy output.asm
   %(prog)s examples/arithmetic.toy build/arithmetic.asm
-        """
+        """,
     )
 
-    parser.add_argument(
-        "input",
-        help="Input .toy source file"
-    )
+    parser.add_argument("input", help="Input .toy source file")
 
-    parser.add_argument(
-        "output",
-        help="Output .asm assembly file"
-    )
+    parser.add_argument("output", help="Output .asm assembly file")
 
     args = parser.parse_args()
     compile_file(args.input, args.output)

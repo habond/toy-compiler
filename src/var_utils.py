@@ -1,6 +1,5 @@
 """Utilities for variable analysis."""
 
-from typing import Tuple
 from src.ast_nodes import *
 from src.ast_walker import walk
 
@@ -14,6 +13,7 @@ def collect_program_variables(program: Program) -> set[str]:
             case Var(name=name):
                 variables.add(name)
     return variables
+
 
 def collect_subroutine_local_variables(subroutine: SubroutineDef) -> set[str]:
     params = set(subroutine.params)

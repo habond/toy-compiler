@@ -1,12 +1,12 @@
 """AST Node definitions for the toy language."""
 
 from dataclasses import dataclass
-from typing import List, Optional
 from enum import Enum
 
 
 class BinOpType(Enum):
     """Binary operator types."""
+
     # Arithmetic operators
     ADD = "+"
     SUB = "-"
@@ -28,8 +28,9 @@ class BinOpType(Enum):
 
 class UnaryOpType(Enum):
     """Unary operator types."""
-    NEGATE = "-"   # Arithmetic negation
-    NOT = "!"      # Logical NOT
+
+    NEGATE = "-"  # Arithmetic negation
+    NOT = "!"  # Logical NOT
 
 
 @dataclass
@@ -56,7 +57,6 @@ class Assignment(Statement):
         return f"{self.name} = {self.value};"
 
 
-
 @dataclass
 class Print(Statement):
     expr: "Expr"
@@ -68,8 +68,8 @@ class Print(Statement):
 @dataclass
 class IfStmt(Statement):
     condition: "Expr"
-    then_body: List[Statement]
-    else_body: Optional[List[Statement]] = None
+    then_body: list[Statement]
+    else_body: list[Statement] | None = None
 
     def __str__(self) -> str:
         return f"if {self.condition}"
@@ -78,7 +78,7 @@ class IfStmt(Statement):
 @dataclass
 class WhileLoop(Statement):
     condition: "Expr"
-    body: List[Statement]
+    body: list[Statement]
 
     def __str__(self) -> str:
         return f"while {self.condition}"
@@ -93,6 +93,22 @@ class ReturnStmt(Statement):
 
 
 @dataclass
+class Break(Statement):
+    """Break statement - exits the innermost loop."""
+
+    def __str__(self) -> str:
+        return "break;"
+
+
+@dataclass
+class Continue(Statement):
+    """Continue statement - skips to next iteration of innermost loop."""
+
+    def __str__(self) -> str:
+        return "continue;"
+
+
+@dataclass
 class CallStmt(Statement):
     call: "Call"
 
@@ -103,8 +119,8 @@ class CallStmt(Statement):
 @dataclass
 class SubroutineDef(ASTNode):
     name: str
-    params: List[str]
-    body: List[Statement]
+    params: list[str]
+    body: list[Statement]
 
     def __str__(self) -> str:
         params_str = ", ".join(self.params)
@@ -113,10 +129,10 @@ class SubroutineDef(ASTNode):
 
 @dataclass
 class Program(ASTNode):
-    top_level: List[ASTNode]  # Can be SubroutineDef or Statement
+    top_level: list[ASTNode]  # Can be SubroutineDef or Statement
 
     def __str__(self) -> str:
-        return '\n'.join([str(item) for item in self.top_level])
+        return "\n".join([str(item) for item in self.top_level])
 
 
 # Expressions
@@ -154,6 +170,7 @@ class BinOp(Expr):
     - &&: If left is false (0), returns 0 without evaluating right
     - ||: If left is true (non-zero), returns 1 without evaluating right
     """
+
     op: BinOpType
     left: Expr
     right: Expr
@@ -170,6 +187,7 @@ class UnaryOp(Expr):
     - Arithmetic negation (-): Returns the negative of the operand
     - Logical NOT (!): Returns 1 if operand is 0, otherwise returns 0
     """
+
     op: UnaryOpType
     operand: Expr
 
@@ -180,7 +198,7 @@ class UnaryOp(Expr):
 @dataclass
 class Call(Expr):
     name: str
-    args: List[Expr]
+    args: list[Expr]
 
     def __str__(self) -> str:
         args_str = ", ".join([str(arg) for arg in self.args])

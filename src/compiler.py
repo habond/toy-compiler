@@ -7,10 +7,11 @@ pointers for variable management across nested scopes (main program and subrouti
 The generated assembly follows the System V AMD64 ABI calling convention.
 """
 
+from dataclasses import dataclass, field
 from textwrap import dedent
+
 from src.ast_nodes import *
 from src.var_utils import collect_program_variables, collect_subroutine_local_variables
-
 
 # Assembly Templates
 # These templates are formatted strings that generate x86-64 assembly code
@@ -170,18 +171,32 @@ ASM_LABEL = "{label}:"
 # Constants for stack layout
 BYTES_PER_QWORD = 8  # Each 64-bit value occupies 8 bytes on the stack
 PARAM_OFFSET_START = 2  # Parameter indexing starts at 2 qwords (16 bytes) above rbp
-                        # This skips: saved rbp (at rbp+0) and return address (at rbp+8)
+# This skips: saved rbp (at rbp+0) and return address (at rbp+8)
 
 # Mapping from comparison operators to x86 condition codes
 # These are used with the SETcc instruction to convert comparison results to boolean values
 COMPARISON_CONDITIONS = {
-    BinOpType.LE: 'le',  # Less than or Equal (signed)
-    BinOpType.LT: 'l',   # Less than (signed)
-    BinOpType.EQ: 'e',   # Equal
-    BinOpType.NE: 'ne',  # Not Equal
-    BinOpType.GT: 'g',   # Greater than (signed)
-    BinOpType.GE: 'ge'   # Greater than or Equal (signed)
+    BinOpType.LE: "le",  # Less than or Equal (signed)
+    BinOpType.LT: "l",  # Less than (signed)
+    BinOpType.EQ: "e",  # Equal
+    BinOpType.NE: "ne",  # Not Equal
+    BinOpType.GT: "g",  # Greater than (signed)
+    BinOpType.GE: "ge",  # Greater than or Equal (signed)
 }
+
+
+@dataclass
+class LoopLabels:
+    """Labels for a loop's control flow.
+
+    Attributes:
+        start: Label for the loop's beginning (where continue jumps to).
+        end: Label for the loop's exit (where break jumps to).
+    """
+
+    start: str
+    end: str
+
 
 @dataclass
 class FrameMetadata:
@@ -191,7 +206,11 @@ class FrameMetadata:
     Positive offsets indicate parameters (above rbp), while negative offsets indicate
     local variables (below rbp).
     """
+
     var_offsets: dict[str, int]  # Maps variable name to its rbp-relative offset
+    loop_label_stack: list[LoopLabels] = field(
+        default_factory=list
+    )  # Stack of loop labels for break/continue
 
 
 class Compiler:
@@ -206,6 +225,7 @@ class Compiler:
         label_counter: Counter for generating unique labels for branches and loops
         frame_metadata_stack: Stack of FrameMetadata for the current compilation context
     """
+
     code: list[str]
     label_counter: int
     frame_metadata_stack: list[FrameMetadata]
@@ -235,6 +255,30 @@ class Compiler:
         """
         return self.get_current_frame().var_offsets[name]
 
+    def push_loop_labels(self, start_label: str, end_label: str) -> None:
+        """Push a new loop's labels onto the loop label stack.
+
+        Args:
+            start_label: Label for the loop's start (where continue jumps to).
+            end_label: Label for the loop's end (where break jumps to).
+        """
+        self.get_current_frame().loop_label_stack.append(
+            LoopLabels(start=start_label, end=end_label)
+        )
+
+    def pop_loop_labels(self) -> None:
+        """Pop the current loop's labels from the loop label stack."""
+        self.get_current_frame().loop_label_stack.pop()
+
+    def get_current_loop_labels(self) -> LoopLabels:
+        """Get the labels of the current (innermost) loop.
+
+        Returns:
+            LoopLabels containing start and end labels for the current loop.
+            start is where continue jumps to, end is where break jumps to.
+        """
+        return self.get_current_frame().loop_label_stack[-1]
+
     def fresh_label_group(self, *prefixes: str) -> tuple[str, ...]:
         """Generate a group of unique labels with the given prefixes.
 
@@ -262,7 +306,7 @@ class Compiler:
             A string containing the complete assembly program.
         """
         self.program(program)
-        return '\n'.join(self.code)
+        return "\n".join(self.code)
 
     def emit(self, code: str, indent_level: int = 1) -> None:
         """Emit assembly code with automatic indentation.
@@ -271,11 +315,11 @@ class Compiler:
             code: The assembly code to emit (may be multiline).
             indent_level: Number of tab characters to prepend to each line.
         """
-        for line in dedent(code).strip().split('\n'):
+        for line in dedent(code).strip().split("\n"):
             if line.strip():  # Non-empty lines get indented
-                self.code.append('\t' * indent_level + line)
+                self.code.append("\t" * indent_level + line)
             else:  # Empty lines stay empty
-                self.code.append('')
+                self.code.append("")
 
     def emit_raw(self, code: str) -> None:
         """Emit assembly code without any indentation.
@@ -306,7 +350,9 @@ class Compiler:
 
         # Calculate stack offsets for each variable (negative offsets = below rbp)
         # Variables are indexed: rbp-8, rbp-16, rbp-24, etc.
-        var_offsets = {var:(-((idx+1)*BYTES_PER_QWORD)) for (idx, var) in enumerate(vars)}
+        var_offsets = {
+            var: (-((idx + 1) * BYTES_PER_QWORD)) for (idx, var) in enumerate(vars)
+        }
 
         # Create frame metadata and push onto stack (this is the main program's frame)
         frame_metadata = FrameMetadata(var_offsets)
@@ -327,11 +373,11 @@ class Compiler:
         self.emit("")
 
         # Allocate stack space for all main program variables
-        self.emit(ASM_VAR_ALLOC.format(
-            vars=", ".join(vars),
-            byte_count=byte_count,
-            var_count=var_count
-        ))
+        self.emit(
+            ASM_VAR_ALLOC.format(
+                vars=", ".join(vars), byte_count=byte_count, var_count=var_count
+            )
+        )
         self.emit("")
 
         # Emit statements and subroutines
@@ -378,11 +424,16 @@ class Compiler:
 
         # Calculate offsets for parameters (positive offsets, above rbp)
         # First parameter is at rbp+16, second at rbp+24, etc.
-        param_offsets = {var:((idx+PARAM_OFFSET_START)*BYTES_PER_QWORD) for (idx, var) in enumerate(params)}
+        param_offsets = {
+            var: ((idx + PARAM_OFFSET_START) * BYTES_PER_QWORD)
+            for (idx, var) in enumerate(params)
+        }
 
         # Calculate offsets for local variables (negative offsets, below rbp)
         # First local at rbp-8, second at rbp-16, etc.
-        local_offsets = {var:(-((idx+1)*BYTES_PER_QWORD)) for (idx, var) in enumerate(body_vars)}
+        local_offsets = {
+            var: (-((idx + 1) * BYTES_PER_QWORD)) for (idx, var) in enumerate(body_vars)
+        }
         local_var_count = len(local_offsets)
         local_byte_count = local_var_count * BYTES_PER_QWORD
 
@@ -396,8 +447,12 @@ class Compiler:
         # Emit subroutine header with jump-over to prevent inline execution
         self.emit("")
         self.emit(f"; ===== Subroutine: {name} =====")
-        self.emit(ASM_JMP.format(label=sub_end))  # Skip over subroutine during main flow
-        self.emit_raw(ASM_LABEL.format(label=sub_start))  # Entry point for CALL instruction
+        self.emit(
+            ASM_JMP.format(label=sub_end)
+        )  # Skip over subroutine during main flow
+        self.emit_raw(
+            ASM_LABEL.format(label=sub_start)
+        )  # Entry point for CALL instruction
 
         # Set up stack frame (save caller's rbp, establish new frame)
         self.emit(ASM_FRAME_SETUP)
@@ -408,7 +463,7 @@ class Compiler:
 
         # Show parameters (positive offsets)
         if params:
-            for var, offset in sorted([(v, o) for v, o in param_offsets.items()], key=lambda x: -x[1]):
+            for var, offset in sorted(param_offsets.items(), key=lambda x: -x[1]):
                 self.emit(f";   [rbp{offset:+d}] = {var}")
 
         # Show call frame (fixed locations)
@@ -417,15 +472,17 @@ class Compiler:
 
         # Show local variables (negative offsets)
         if body_vars:
-            for var, offset in sorted([(v, o) for v, o in local_offsets.items()], key=lambda x: -x[1]):
+            for var, offset in sorted(local_offsets.items(), key=lambda x: -x[1]):
                 self.emit(f";   [rbp{offset:+d}] = {var}")
 
         # Allocate stack space for local variables only (parameters already on stack)
-        self.emit(ASM_VAR_ALLOC.format(
-            vars=", ".join(body_vars),
-            byte_count=local_byte_count,
-            var_count=local_var_count
-        ))
+        self.emit(
+            ASM_VAR_ALLOC.format(
+                vars=", ".join(body_vars),
+                byte_count=local_byte_count,
+                var_count=local_var_count,
+            )
+        )
         self.emit("")
 
         # Compile subroutine body statements
@@ -471,7 +528,9 @@ class Compiler:
 
             case IfStmt(condition, then_body, else_body):
                 # Generate unique labels for if/else/fi branches
-                if_label, else_label, fi_label = self.fresh_label_group("if", "else", "fi")
+                if_label, else_label, fi_label = self.fresh_label_group(
+                    "if", "else", "fi"
+                )
                 self.emit("; If statement")
                 self.emit_raw(ASM_LABEL.format(label=if_label))
 
@@ -506,6 +565,7 @@ class Compiler:
             case WhileLoop(condition, body):
                 # Generate unique labels for loop start and exit
                 while_label, done_label = self.fresh_label_group("while", "done")
+                self.push_loop_labels(while_label, done_label)
                 self.emit("; While loop")
 
                 # Loop entry point (condition check)
@@ -527,6 +587,8 @@ class Compiler:
                 self.emit("; End while")
                 self.emit_raw(ASM_LABEL.format(label=done_label))
 
+                self.pop_loop_labels()
+
             case Print(expr):
                 # Evaluate expression and print result
                 self.expr(expr)
@@ -543,9 +605,21 @@ class Compiler:
                 # Discard the return value since this is a statement, not expression
                 self.emit(ASM_DISCARD_RETURN)
 
+            case Continue():
+                # Jump to loop start (next iteration)
+                loop_labels = self.get_current_loop_labels()
+                self.emit("; Continue to next iteration")
+                self.emit(ASM_JMP.format(label=loop_labels.start))
+
+            case Break():
+                # Jump to loop end (exit loop)
+                loop_labels = self.get_current_loop_labels()
+                self.emit("; Break out of loop")
+                self.emit(ASM_JMP.format(label=loop_labels.end))
+
             case other:
                 raise ValueError(f"Unexpected statement '{type(other).__name__}'")
-    
+
     def expr(self, expr: Expr) -> None:
         """Compile an expression.
 
@@ -600,7 +674,9 @@ class Compiler:
                         self.emit(ASM_BINOP_DIV)
                     case _ if op in COMPARISON_CONDITIONS:
                         # Comparison operators produce boolean results (0 or 1)
-                        self.emit(ASM_BINOP_CMP.format(condition=COMPARISON_CONDITIONS[op]))
+                        self.emit(
+                            ASM_BINOP_CMP.format(condition=COMPARISON_CONDITIONS[op])
+                        )
                     case _:
                         raise ValueError(f"Unexpected operator '{op}'")
 

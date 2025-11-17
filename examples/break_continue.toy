@@ -1,0 +1,149 @@
+// Test break and continue statements in loops
+
+// ===== Basic Break =====
+
+// Simple break - exit loop early
+x = 0;
+while x < 10 {
+    if x == 5 {
+        break;
+    }
+    print x;
+    x = x + 1;
+}
+
+// ===== Basic Continue =====
+
+// Simple continue - skip even numbers
+counter = 0;
+while counter < 5 {
+    counter = counter + 1;
+    if counter == 2 || counter == 4 {
+        continue;
+    }
+    print counter;
+}
+
+// ===== Break with Condition =====
+
+// Find first number divisible by 7
+num = 1;
+while num < 100 {
+    if num - num / 7 * 7 == 0 {
+        print num;
+        break;
+    }
+    num = num + 1;
+}
+
+// ===== Continue with Multiple Conditions =====
+
+// Print numbers that are not 3 and not 6
+i = 0;
+while i < 10 {
+    i = i + 1;
+    if i == 3 {
+        continue;
+    }
+    if i == 6 {
+        continue;
+    }
+    print i;
+}
+
+// ===== Nested Loops with Break (outer loop) =====
+
+// Break only affects innermost loop
+outer = 0;
+while outer < 3 {
+    inner = 0;
+    while inner < 5 {
+        if inner == 3 {
+            break;  // Breaks inner loop only
+        }
+        print inner;
+        inner = inner + 1;
+    }
+    print 100;  // Should print 3 times
+    outer = outer + 1;
+}
+
+// ===== Nested Loops with Continue =====
+
+// Continue in nested loop
+a = 0;
+while a < 3 {
+    b = 0;
+    while b < 4 {
+        b = b + 1;
+        if b == 2 {
+            continue;  // Skip when b == 2
+        }
+        print b;
+    }
+    print 200;
+    a = a + 1;
+}
+
+// ===== Complex: Break and Continue Together =====
+
+// Print odd numbers up to 10, but stop at 7
+n = 0;
+while n < 20 {
+    n = n + 1;
+
+    // Skip even numbers
+    if n - n / 2 * 2 == 0 {
+        continue;
+    }
+
+    // Stop at 7
+    if n > 7 {
+        break;
+    }
+
+    print n;
+}
+
+// ===== Break in Loop with Boolean Condition =====
+
+// Search for target value
+value = 0;
+target = 42;
+found = 0;
+
+while value < 100 && !found {
+    if value == target {
+        print value;
+        found = 1;
+        break;
+    }
+    value = value + 1;
+}
+
+// ===== Continue with Negation =====
+
+// Print values where condition is NOT met
+x = 0;
+while x < 6 {
+    x = x + 1;
+    if !(x == 2 || x == 5) {
+        continue;  // Skip everything except 2 and 5
+    }
+    print x;
+}
+
+// ===== Infinite Loop with Break =====
+
+// Loop forever until condition met
+count = 0;
+while 1 {
+    count = count + 1;
+    if count > 3 {
+        break;
+    }
+    print count;
+}
+
+// ===== End Marker =====
+print 9999;

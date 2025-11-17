@@ -20,7 +20,10 @@ select = [
 ]
 
 # Ignore specific rules if needed
-ignore = []
+ignore = [
+    "F403",  # Star imports used intentionally for pattern matching
+    "F405",  # Names may be undefined from star imports (covered by mypy)
+]
 
 [tool.ruff.format]
 # Use double quotes for strings

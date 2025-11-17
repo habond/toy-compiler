@@ -1,7 +1,9 @@
 """Parser for the toy language using Lark."""
 
 from pathlib import Path
+
 from lark import Lark, Transformer, v_args
+
 from src.ast_nodes import *
 
 
@@ -39,6 +41,12 @@ class ASTBuilder(Transformer):
     @v_args(inline=True)
     def return_stmt(self, expr):
         return ReturnStmt(expr=expr)
+
+    def break_stmt(self, items):
+        return Break()
+
+    def continue_stmt(self, items):
+        return Continue()
 
     @v_args(inline=True)
     def call_stmt(self, name, args):
@@ -137,7 +145,7 @@ class Parser:
 
     def __init__(self, grammar_path: str = "src/grammar.lark"):
         grammar_file = Path(grammar_path)
-        with open(grammar_file, "r") as f:
+        with open(grammar_file) as f:
             grammar = f.read()
 
         self.parser = Lark(grammar, parser="lalr")
@@ -146,4 +154,6 @@ class Parser:
     def parse(self, code: str) -> Program:
         """Parse source code and return AST."""
         parse_tree = self.parser.parse(code)
-        return self.transformer.transform(parse_tree)
+        result = self.transformer.transform(parse_tree)
+        assert isinstance(result, Program)
+        return result

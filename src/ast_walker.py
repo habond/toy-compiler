@@ -1,10 +1,11 @@
 """Simple AST walker that yields all nodes in the tree."""
 
+from collections.abc import Iterator
+
 from src.ast_nodes import *
-from typing import Iterator
 
 
-def walk(node: ASTNode, skip: list[type[ASTNode]] = []) -> Iterator[ASTNode]:
+def walk(node: ASTNode, skip: list[type[ASTNode]] | None = None) -> Iterator[ASTNode]:
     """
     Walk an AST and yield every node in pre-order.
 
@@ -25,6 +26,10 @@ def walk(node: ASTNode, skip: list[type[ASTNode]] = []) -> Iterator[ASTNode]:
         for node in walk(program, skip=[SubroutineDef, ReturnStmt]):
             print(type(node).__name__)
     """
+    # Initialize skip list if not provided
+    if skip is None:
+        skip = []
+
     # Skip this node and its children if it matches the skip types
     if skip and type(node) in skip:
         return
@@ -51,6 +56,10 @@ def walk(node: ASTNode, skip: list[type[ASTNode]] = []) -> Iterator[ASTNode]:
         case ReturnStmt(expr=expr):
             if expr:
                 yield from walk(expr, skip)
+
+        case Break() | Continue():
+            # Leaf nodes - no children to traverse
+            pass
 
         case CallStmt(call=call):
             yield from walk(call, skip)

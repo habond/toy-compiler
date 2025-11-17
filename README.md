@@ -12,7 +12,7 @@ The language supports:
 - **Unary Operators**: `-` (negation), `!` (logical NOT)
 - **Comparisons**: `==`, `!=`, `<`, `<=`, `>`, `>=` (return 1 for true, 0 for false)
 - **Boolean Logic**: `&&` (AND), `||` (OR) with short-circuit evaluation
-- **Control Flow**: `if` statements with optional `else` blocks, `while` loops
+- **Control Flow**: `if` statements with optional `else` blocks, `while` loops, `break`, and `continue`
 - **Output**: `print` statement for displaying integers
 - **Comments**: Single-line comments with `//`
 
@@ -125,6 +125,41 @@ x = 5;
 while x {
     print x;
     x = x - 1;
+}
+
+// Break statement - exit the loop early
+i = 0;
+while 1 {  // Infinite loop
+    print i;
+    i = i + 1;
+    if i >= 5 {
+        break;  // Exit when i reaches 5
+    }
+}
+
+// Continue statement - skip to next iteration
+i = 0;
+while i < 10 {
+    i = i + 1;
+    if i == 3 || i == 6 {
+        continue;  // Skip printing 3 and 6
+    }
+    print i;
+}
+
+// Nested loops with break/continue
+x = 0;
+while x < 3 {
+    y = 0;
+    while y < 3 {
+        if y == 1 {
+            y = y + 1;
+            continue;  // Skip when y is 1
+        }
+        print x * 10 + y;
+        y = y + 1;
+    }
+    x = x + 1;
 }
 ```
 
@@ -421,6 +456,7 @@ The `examples/` directory contains several programs demonstrating language featu
 - **comparisons.toy**: All comparison operators (`==`, `!=`, `<`, `<=`, `>`, `>=`)
 - **boolean_ops.toy**: Boolean operators (`&&`, `||`) with short-circuit evaluation
 - **unary.toy**: Unary operators (negation `-`, logical NOT `!`)
+- **break_continue.toy**: Loop control flow with `break` and `continue` statements
 - **simple_sub.toy**: Basic subroutine with parameters and return value
 - **subroutines.toy**: Advanced subroutine features including recursion, void functions, and nested calls
 - **comprehensive.toy**: Complete feature showcase including all operators, subroutines, recursion, nested loops, conditionals, and control flow
