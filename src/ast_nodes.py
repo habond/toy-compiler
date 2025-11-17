@@ -1,6 +1,6 @@
 """AST Node definitions for the toy language."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 
 
@@ -34,8 +34,49 @@ class UnaryOpType(Enum):
 
 
 @dataclass
+class SourceLocation:
+    """Source code location information for an AST node.
+
+    Tracks the file, line, and column where a construct appears in source code.
+    Used for error messages and debugging.
+    """
+
+    file: str | None = None
+    line: int | None = None
+    column: int | None = None
+    end_line: int | None = None
+    end_column: int | None = None
+
+    def __str__(self) -> str:
+        """Format source location as a string for error messages.
+
+        Returns:
+            String like "file.toy:10:5" or "unknown location" if not available
+        """
+        if self.file and self.line and self.column:
+            return f"{self.file}:{self.line}:{self.column}"
+        elif self.line and self.column:
+            return f"line {self.line}, column {self.column}"
+        return "unknown location"
+
+
+@dataclass
 class ASTNode:
-    """Base class for all AST nodes."""
+    """Base class for all AST nodes.
+
+    All AST nodes track their source location for better error messages
+    and debugging. Location is optional and populated during parsing.
+    """
+
+    location: SourceLocation | None = field(default=None, kw_only=True)
+
+    def location_str(self) -> str:
+        """Format source location as a string for error messages.
+
+        Returns:
+            String like "file.toy:10:5" or "unknown location" if not available
+        """
+        return str(self.location) if self.location else "unknown location"
 
 
 # Statements

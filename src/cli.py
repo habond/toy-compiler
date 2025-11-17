@@ -35,7 +35,7 @@ def compile_file(input_file: str, output_file: str) -> None:
     # Parse
     try:
         parser = Parser()
-        ast = parser.parse(source)
+        ast = parser.parse(source, filename=str(input_path))
     except Exception as e:
         print(f"Parse error in '{input_file}':", file=sys.stderr)
         print(f"  {type(e).__name__}: {e}", file=sys.stderr)

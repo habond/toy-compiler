@@ -516,22 +516,37 @@ The AST (Abstract Syntax Tree) implementation follows a clean separation of conc
 - They only hold data - no methods for printing, compiling, or transforming
 - Default `__repr__` provides excellent debugging output automatically
 - Well-documented with clear docstrings explaining each node type
+- Each node includes `SourceLocation` metadata tracking file, line, and column positions
 
 **Separate Concerns:**
 - `CodePrinter` - Converts AST back to source code representation
 - `Compiler` - Transforms AST into x86-64 assembly
 - `ASTWalker` - Traverses AST for analysis (variable collection, etc.)
 
+**Source Location Tracking:**
+- Every AST node includes a `location: SourceLocation | None` field
+- `SourceLocation` captures file, line, column, end_line, and end_column
+- Automatically populated during parsing via the `@with_location` decorator
+- Enables precise error messages, IDE features, and code quality tools
+
 **Benefits:**
 ```python
 from src.parser import Parser
 from src.code_printer import CodePrinter
 
-ast = Parser().parse("x = 5; println x;")
+ast = Parser().parse("x = 5; println x;", filename="example.toy")
 
-# Debugging: See full AST structure
+# Debugging: See full AST structure with location info
 print(ast)
-# Program(top_level=[Assignment(name='x', value=Number(value=5)), Println(value=Var(name='x'))])
+# Program(top_level=[
+#   Assignment(name='x', value=Number(value=5, location=...), location=...),
+#   Println(value=Var(name='x', location=...), location=...)
+# ])
+
+# Access location information for error reporting
+assignment = ast.top_level[0]
+print(f"Assignment at {assignment.location}")
+# Output: Assignment at example.toy:1:1
 
 # Code generation: Pretty-print source
 printer = CodePrinter()
@@ -539,11 +554,18 @@ print(printer.print(ast))
 # x = 5;
 # println x;
 
+# Use locations for enhanced error messages
+def find_undefined_vars(ast):
+    for node in walk(ast):
+        if isinstance(node, Var) and node.name not in defined_vars:
+            print(f"Error at {node.location}: Undefined variable '{node.name}'")
+            # Output: Error at example.toy:2:9: Undefined variable 'x'
+
 # Easy to add new representations without modifying AST nodes
 # Could add: MinifiedPrinter, JSONPrinter, GraphvizPrinter, etc.
 ```
 
-This design keeps AST nodes simple and makes it easy to add new ways to process or display the AST without changing the core data structures.
+This design keeps AST nodes simple and makes it easy to add new ways to process or display the AST without changing the core data structures. The source location tracking enables precise error reporting, IDE integration (go-to-definition, rename refactoring), code coverage analysis, and other developer tools.
 
 ### Compiler Architecture
 
