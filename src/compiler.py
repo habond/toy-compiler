@@ -8,6 +8,7 @@ The generated assembly follows the System V AMD64 ABI calling convention.
 """
 
 from dataclasses import dataclass, field
+from typing import Literal
 
 from src.asm_writer import SectionWriter
 from src.ast_nodes import *
@@ -281,6 +282,41 @@ class Compiler:
         self.label_counter = 0
         self.frame_metadata_stack = []
 
+    def emit(
+        self,
+        code: str,
+        mode: Literal["indented", "raw"] = "indented",
+        section: Literal["text", "data"] = "text",
+    ) -> None:
+        """Emit assembly code to the specified section.
+
+        Args:
+            code: The assembly code string to emit.
+            mode: Either 'indented' (default) or 'raw'. Controls whether the code
+                  is indented or emitted as-is.
+            section: Either 'text' (default) or 'data'. Specifies which section
+                     to emit the code to.
+
+        Raises:
+            ValueError: If mode or section has an invalid value.
+        """
+        # Validate section parameter
+        if section not in ("text", "data"):
+            raise ValueError(f"Invalid section '{section}': must be 'text' or 'data'")
+
+        # Validate mode parameter
+        if mode not in ("indented", "raw"):
+            raise ValueError(f"Invalid mode '{mode}': must be 'indented' or 'raw'")
+
+        # Select the appropriate section writer
+        writer = self.text if section == "text" else self.data
+
+        # Emit using the appropriate mode
+        if mode == "indented":
+            writer.emit(code)
+        else:  # mode == "raw"
+            writer.emit_raw(code)
+
     def get_current_frame(self) -> FrameMetadata:
         """Get the current stack frame metadata.
 
@@ -394,26 +430,26 @@ class Compiler:
         self.frame_metadata_stack.append(frame_metadata)
 
         # Emit program header (section declaration, entry point, external references)
-        self.text.emit_raw(ASM_TEXT_HEADER)
-        self.text.emit("")
+        self.emit(ASM_TEXT_HEADER, mode="raw")
+        self.emit("")
 
         # Set up stack frame pointer for the main program
-        self.text.emit(ASM_FRAME_SETUP)
-        self.text.emit("")
+        self.emit(ASM_FRAME_SETUP)
+        self.emit("")
 
         # Emit variable layout comments for debugging and clarity
-        self.text.emit("; Variable layout (fixed offsets from rbp):")
+        self.emit("; Variable layout (fixed offsets from rbp):")
         for var, offset in var_offsets.items():
-            self.text.emit(f"; [rbp{offset:+d}] = {var}")
-        self.text.emit("")
+            self.emit(f"; [rbp{offset:+d}] = {var}")
+        self.emit("")
 
         # Allocate stack space for all main program variables
-        self.text.emit(
+        self.emit(
             ASM_VAR_ALLOC.format(
                 vars=", ".join(vars), byte_count=byte_count, var_count=var_count
             )
         )
-        self.text.emit("")
+        self.emit("")
 
         # Emit statements and subroutines
         # Subroutine definitions are compiled inline (with jump-over logic)
@@ -424,10 +460,10 @@ class Compiler:
                     self.compile_subroutine(item)
                 case Statement():
                     self.statement(item)
-                    self.text.emit("")
+                    self.emit("")
 
         # Emit cleanup and exit: restore stack and terminate process
-        self.text.emit(ASM_VAR_DEALLOC.format(byte_count=byte_count))
+        self.emit(ASM_VAR_DEALLOC.format(byte_count=byte_count))
 
     def compile_subroutine(self, subroutine: SubroutineDef) -> None:
         """Compile a subroutine definition.
@@ -480,45 +516,45 @@ class Compiler:
         self.frame_metadata_stack.append(frame_metadata)
 
         # Emit subroutine header with jump-over to prevent inline execution
-        self.text.emit("")
-        self.text.emit(f"; ===== Subroutine: {name} =====")
-        self.text.emit(
+        self.emit("")
+        self.emit(f"; ===== Subroutine: {name} =====")
+        self.emit(
             ASM_JMP.format(label=sub_end)
         )  # Skip over subroutine during main flow
-        self.text.emit_raw(
-            ASM_LABEL.format(label=sub_start)
+        self.emit(
+            ASM_LABEL.format(label=sub_start), mode="raw"
         )  # Entry point for CALL instruction
 
         # Set up stack frame (save caller's rbp, establish new frame)
-        self.text.emit(ASM_FRAME_SETUP)
-        self.text.emit("")
+        self.emit(ASM_FRAME_SETUP)
+        self.emit("")
 
         # Emit variable layout comments for debugging
-        self.text.emit("; Subroutine stack layout (from high to low addresses):")
+        self.emit("; Subroutine stack layout (from high to low addresses):")
 
         # Show parameters (positive offsets)
         if params:
             for var, offset in sorted(param_offsets.items(), key=lambda x: -x[1]):
-                self.text.emit(f";   [rbp{offset:+d}] = {var}")
+                self.emit(f";   [rbp{offset:+d}] = {var}")
 
         # Show call frame (fixed locations)
-        self.text.emit(";   [rbp+8] = return address (pushed by CALL)")
-        self.text.emit(";   [rbp+0] = saved caller's rbp")
+        self.emit(";   [rbp+8] = return address (pushed by CALL)")
+        self.emit(";   [rbp+0] = saved caller's rbp")
 
         # Show local variables (negative offsets)
         if body_vars:
             for var, offset in sorted(local_offsets.items(), key=lambda x: -x[1]):
-                self.text.emit(f";   [rbp{offset:+d}] = {var}")
+                self.emit(f";   [rbp{offset:+d}] = {var}")
 
         # Allocate stack space for local variables only (parameters already on stack)
-        self.text.emit(
+        self.emit(
             ASM_VAR_ALLOC.format(
                 vars=", ".join(body_vars),
                 byte_count=local_byte_count,
                 var_count=local_var_count,
             )
         )
-        self.text.emit("")
+        self.emit("")
 
         # Compile subroutine body statements
         for statement in body:
@@ -526,16 +562,16 @@ class Compiler:
 
         # Add implicit return for subroutines that don't have explicit return statement
         # This ensures proper cleanup even if control reaches end of subroutine
-        self.text.emit(ASM_IMPLICIT_RETURN)
+        self.emit(ASM_IMPLICIT_RETURN)
 
         # Emit subroutine footer and skip-over target label
-        self.text.emit("")
-        self.text.emit(f"; ===== End of {name} =====")
-        self.text.emit_raw(ASM_LABEL.format(label=sub_end))  # Jump target for skip-over
+        self.emit("")
+        self.emit(f"; ===== End of {name} =====")
+        self.emit(ASM_LABEL.format(label=sub_end), mode="raw")  # Jump target for skip-over
 
         # Pop frame metadata (return to caller's scope)
         self.frame_metadata_stack.pop()
-        self.text.emit("")
+        self.emit("")
 
     def statement(self, statement: Statement) -> None:
         """Compile a statement.
@@ -549,8 +585,8 @@ class Compiler:
         Raises:
             ValueError: If an unknown statement type is encountered.
         """
-        self.text.emit("")
-        self.text.emit(f"; {statement}")  # Emit source statement as comment for readability
+        self.emit("")
+        self.emit(f"; {statement}")  # Emit source statement as comment for readability
 
         match statement:
             case Assignment(name, expr):
@@ -558,69 +594,69 @@ class Compiler:
                 self.expr(expr)
                 # Pop result and store in variable's memory location
                 offset = self.get_var_offset(name)
-                self.text.emit(ASM_ASSIGNMENT.format(offset=offset))
-                self.text.emit("")
+                self.emit(ASM_ASSIGNMENT.format(offset=offset))
+                self.emit("")
 
             case IfStmt(condition, then_body, else_body):
                 # Generate unique labels for if/else/fi branches
                 if_label, else_label, fi_label = self.fresh_label_group(
                     "if", "else", "fi"
                 )
-                self.text.emit("; If statement")
-                self.text.emit_raw(ASM_LABEL.format(label=if_label))
+                self.emit("; If statement")
+                self.emit(ASM_LABEL.format(label=if_label), mode="raw")
 
                 # Evaluate condition (result left on stack as 0 or 1)
                 self.expr(condition)
-                self.text.emit("")
+                self.emit("")
 
                 if else_body:
                     # If-else: jump to else if condition is false
-                    self.text.emit(ASM_CONDITION_CHECK.format(label=else_label))
+                    self.emit(ASM_CONDITION_CHECK.format(label=else_label))
                     # Compile then branch
                     for statement in then_body:
                         self.statement(statement)
                     # Jump past else branch after completing then branch
-                    self.text.emit(ASM_JMP.format(label=fi_label))
+                    self.emit(ASM_JMP.format(label=fi_label))
                     # Compile else branch
-                    self.text.emit("; Else branch")
-                    self.text.emit_raw(ASM_LABEL.format(label=else_label))
+                    self.emit("; Else branch")
+                    self.emit(ASM_LABEL.format(label=else_label), mode="raw")
                     for statement in else_body:
                         self.statement(statement)
                 else:
                     # If-only: jump to end if condition is false
-                    self.text.emit(ASM_CONDITION_CHECK.format(label=fi_label))
+                    self.emit(ASM_CONDITION_CHECK.format(label=fi_label))
                     # Compile then branch
                     for statement in then_body:
                         self.statement(statement)
 
                 # End of if statement
-                self.text.emit("; End if")
-                self.text.emit_raw(ASM_LABEL.format(label=fi_label))
+                self.emit("; End if")
+                self.emit(ASM_LABEL.format(label=fi_label), mode="raw")
 
             case WhileLoop(condition, body):
                 # Generate unique labels for loop start and exit
                 while_label, done_label = self.fresh_label_group("while", "done")
                 self.push_loop_labels(while_label, done_label)
-                self.text.emit("; While loop")
+                self.emit("; While loop")
 
                 # Loop entry point (condition check)
-                self.text.emit_raw(ASM_LABEL.format(label=while_label))
+                self.emit(ASM_LABEL.format(label=while_label), mode="raw")
                 self.expr(condition)
-                self.text.emit("")
+                self.emit("")
 
                 # Exit loop if condition is false
-                self.text.emit(ASM_CONDITION_CHECK.format(label=done_label))
+                self.emit(ASM_CONDITION_CHECK.format(label=done_label))
 
                 # Compile loop body
                 for statement in body:
                     self.statement(statement)
 
                 # Jump back to condition check
-                self.text.emit(ASM_JMP.format(label=while_label))
+                self.emit(ASM_JMP.format(label=while_label))
 
                 # Loop exit point
-                self.text.emit("; End while")
-                self.text.emit_raw(ASM_LABEL.format(label=done_label))
+                self.emit("; End while")
+                self.emit(ASM_LABEL.format(label=done_label), mode="raw")
 
                 self.pop_loop_labels()
 
@@ -629,47 +665,47 @@ class Compiler:
                 match value:
                     case String(string_value):
                         (label,) = self.fresh_label_group("const")
-                        self.data.emit(ASM_DATA_STRING.format(label=label, value=string_value))
-                        self.data.emit("")
-                        self.text.emit(ASM_PRINT_STRING.format(label=label))
+                        self.emit(ASM_DATA_STRING.format(label=label, value=string_value), section="data")
+                        self.emit("", section="data")
+                        self.emit(ASM_PRINT_STRING.format(label=label))
                     case Expr():
                         self.expr(value)
-                        self.text.emit(ASM_PRINT_INT)
+                        self.emit(ASM_PRINT_INT)
 
             case Println(value):
                 # Print with newline
                 match value:
                     case String(string_value):
                         (label,) = self.fresh_label_group("const")
-                        self.data.emit(ASM_DATA_STRING.format(label=label, value=string_value))
-                        self.data.emit("")
-                        self.text.emit(ASM_PRINTLN_STRING.format(label=label))
+                        self.emit(ASM_DATA_STRING.format(label=label, value=string_value), section="data")
+                        self.emit("", section="data")
+                        self.emit(ASM_PRINTLN_STRING.format(label=label))
                     case Expr():
                         self.expr(value)
-                        self.text.emit(ASM_PRINTLN_INT)
+                        self.emit(ASM_PRINTLN_INT)
 
             case ReturnStmt(expr):
                 # Evaluate return expression and return from subroutine
                 self.expr(expr)
-                self.text.emit(ASM_RETURN)
+                self.emit(ASM_RETURN)
 
             case CallStmt(expr):
                 # Call subroutine expression (result pushed to stack)
                 self.expr(expr)
                 # Discard the return value since this is a statement, not expression
-                self.text.emit(ASM_DISCARD_RETURN)
+                self.emit(ASM_DISCARD_RETURN)
 
             case Continue():
                 # Jump to loop start (next iteration)
                 loop_labels = self.get_current_loop_labels()
-                self.text.emit("; Continue to next iteration")
-                self.text.emit(ASM_JMP.format(label=loop_labels.start))
+                self.emit("; Continue to next iteration")
+                self.emit(ASM_JMP.format(label=loop_labels.start))
 
             case Break():
                 # Jump to loop end (exit loop)
                 loop_labels = self.get_current_loop_labels()
-                self.text.emit("; Break out of loop")
-                self.text.emit(ASM_JMP.format(label=loop_labels.end))
+                self.emit("; Break out of loop")
+                self.emit(ASM_JMP.format(label=loop_labels.end))
 
             case other:
                 raise ValueError(f"Unexpected statement '{type(other).__name__}'")
@@ -692,19 +728,19 @@ class Compiler:
                 match op:
                     case UnaryOpType.NOT:
                         self.expr(operand)
-                        self.text.emit(ASM_UNARYOP_NOT)
+                        self.emit(ASM_UNARYOP_NOT)
                     case UnaryOpType.NEGATE:
                         self.expr(operand)
-                        self.text.emit(ASM_UNARYOP_NEG)
+                        self.emit(ASM_UNARYOP_NEG)
 
             case Number(num):
                 # Push literal number onto stack
-                self.text.emit(ASM_PUSH_NUMBER.format(num=num))
+                self.emit(ASM_PUSH_NUMBER.format(num=num))
 
             case Var(name):
                 # Look up variable's offset and push its value onto stack
                 offset = self.get_var_offset(name)
-                self.text.emit(ASM_PUSH_VAR.format(offset=offset))
+                self.emit(ASM_PUSH_VAR.format(offset=offset))
 
             case BinOp(op, left, right):
                 # Evaluate left operand (result on stack)
@@ -715,20 +751,20 @@ class Compiler:
                 # Apply operator: pops operands, pushes result
                 match op:
                     case BinOpType.AND:
-                        self.text.emit(ASM_BINOP_AND)
+                        self.emit(ASM_BINOP_AND)
                     case BinOpType.OR:
-                        self.text.emit(ASM_BINOP_OR)
+                        self.emit(ASM_BINOP_OR)
                     case BinOpType.ADD:
-                        self.text.emit(ASM_BINOP_ADD)
+                        self.emit(ASM_BINOP_ADD)
                     case BinOpType.SUB:
-                        self.text.emit(ASM_BINOP_SUB)
+                        self.emit(ASM_BINOP_SUB)
                     case BinOpType.MUL:
-                        self.text.emit(ASM_BINOP_MUL)
+                        self.emit(ASM_BINOP_MUL)
                     case BinOpType.DIV:
-                        self.text.emit(ASM_BINOP_DIV)
+                        self.emit(ASM_BINOP_DIV)
                     case _ if op in COMPARISON_CONDITIONS:
                         # Comparison operators produce boolean results (0 or 1)
-                        self.text.emit(
+                        self.emit(
                             ASM_BINOP_CMP.format(condition=COMPARISON_CONDITIONS[op])
                         )
                     case _:
@@ -742,7 +778,7 @@ class Compiler:
 
                 # Call subroutine and clean up arguments from stack
                 # Result is placed in rax and then pushed onto stack
-                self.text.emit(ASM_CALL_SUB.format(name=name, byte_count=len(args) * 8))
+                self.emit(ASM_CALL_SUB.format(name=name, byte_count=len(args) * 8))
 
             case other:
                 raise ValueError(f"Unexpected expr '{type(other).__name__}'")
