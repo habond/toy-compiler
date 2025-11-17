@@ -59,10 +59,12 @@ class Assignment(Statement):
 
 @dataclass
 class Print(Statement):
-    expr: "Expr"
+    value: "Expr | str"
 
     def __str__(self) -> str:
-        return f"print {self.expr};"
+        if isinstance(self.value, str):
+            return f'print "{self.value}";'
+        return f"print {self.value};"
 
 
 @dataclass
@@ -149,6 +151,14 @@ class Number(Expr):
 
     def __str__(self) -> str:
         return str(self.value)
+
+
+@dataclass
+class String(Expr):
+    value: str
+
+    def __str__(self) -> str:
+        return f'"{self.value}"'
 
 
 @dataclass

@@ -1,5 +1,8 @@
 // Comprehensive example demonstrating all language features
-// This program integrates subroutines, operators, control flow, and recursion
+// This program is a mathematical computation library with test output
+
+print "=== Mathematical Computation Library ===";
+print "";
 
 // ===== Utility Subroutines =====
 
@@ -30,7 +33,7 @@ sub is_even(n) {
     return !remainder;  // NOT: converts 0 to 1, non-zero to 0
 }
 
-// Safe division with negation handling
+// Safe division with error handling
 sub safe_divide(dividend, divisor) {
     if divisor == 0 {
         return 0;
@@ -45,7 +48,7 @@ sub find_divisible(start, end, divisor) {
     while current <= end {
         remainder = current - current / divisor * divisor;
         if remainder == 0 {
-            return current;  // Found it, break via return
+            return current;
         }
         current = current + 1;
     }
@@ -60,7 +63,7 @@ sub count_skip_threes(start, end) {
         remainder = i - i / 3 * 3;
         if remainder == 0 {
             i = i + 1;
-            continue;  // Skip multiples of 3
+            continue;
         }
         count = count + 1;
         i = i + 1;
@@ -68,66 +71,84 @@ sub count_skip_threes(start, end) {
     return count;
 }
 
-// ===== Main Program =====
+// ===== Test Suite =====
 
-// Test absolute value with negative numbers
+print "Test 1: Absolute Value";
 x = -15;
 abs_x = abs(x);
-print abs_x;  // 15
+print "  abs(-15) = ";
+print abs_x;
 
 y = 10;
 abs_y = abs(y);
-print abs_y;  // 10
+print "  abs(10) = ";
+print abs_y;
+print "";
 
-// Range checking with boolean operators
+print "Test 2: Range Checking";
 age = 25;
 min_age = 18;
 max_age = 65;
-
+print "  Is age 25 in range [18, 65]?";
 if in_range(age, min_age, max_age) {
-    print 1;  // In range
+    print "  Yes, in range";
 } else {
-    print 0;
+    print "  No, out of range";
 }
+print "";
 
-// Complex expression with unary and binary operators
-val = -5 + 3 * 2;  // -5 + 6 = 1
+print "Test 3: Expression Evaluation";
+val = -5 + 3 * 2;
+print "  -5 + 3 * 2 = ";
 print val;
+print "";
 
-// NOT operator in conditional
+print "Test 4: Error Checking";
 has_error = 0;
 if !has_error {
-    print 100;  // No error
+    print "  System status: OK";
 }
+print "";
 
-// Factorial with comparison
+print "Test 5: Factorial Computation";
 fact3 = factorial(3);
 fact4 = factorial(4);
-print fact3;  // 6
-print fact4;  // 24
+print "  3! = ";
+print fact3;
+print "  4! = ";
+print fact4;
 
 if fact4 > fact3 {
-    print 200;
+    print "  Verification: 4! > 3!";
 }
+print "";
 
-// Even/odd checking with loops and NOT
+print "Test 6: Even Number Filter";
+print "  Even numbers from 5 to 1:";
 counter = 5;
 while counter > 0 {
     if is_even(counter) {
-        print counter;  // Print even numbers: 4, 2
+        print "    ";
+        print counter;
     }
     counter = counter - 1;
 }
+print "";
 
-// Test find_divisible with break-like behavior
+print "Test 7: Divisibility Search";
+print "  First multiple of 7 in [1, 20]: ";
 first_div_7 = find_divisible(1, 20, 7);
-print first_div_7;  // 7
+print first_div_7;
+print "";
 
-// Test count_skip_threes with continue
+print "Test 8: Skip Counter (continue)";
+print "  Count 1-10 skipping multiples of 3: ";
 count = count_skip_threes(1, 10);
-print count;  // 6 (skips 3, 6, 9)
+print count;
+print "";
 
-// Direct use of break - find first number over 50
+print "Test 9: Search with Break";
+print "  Find first number > 50:";
 search = 0;
 while 1 {
     search = search + 1;
@@ -135,56 +156,63 @@ while 1 {
         break;
     }
 }
-print search;  // 51
+print "    ";
+print search;
+print "";
 
-// Direct use of continue - print only odd numbers
+print "Test 10: Odd Number Filter (continue)";
+print "  Odd numbers 1 to 5:";
 num = 0;
 while num < 6 {
     num = num + 1;
     if is_even(num) {
-        continue;  // Skip even numbers
+        continue;
     }
-    print num;  // 1, 3, 5
+    print "    ";
+    print num;
 }
+print "";
 
-// Boolean logic with AND/OR
+print "Test 11: Boolean AND Logic";
 x = 10;
 y = 20;
-
-// Range check using AND
 if x > 0 && x < 100 && y > 0 && y < 100 {
-    print 300;
+    print "  Both values in valid range";
 }
+print "";
 
-// Multiple conditions with OR
+print "Test 12: Boolean OR Logic";
 weekend = 0;
 vacation = 1;
 sick = 0;
-
 can_rest = weekend == 1 || vacation == 1 || sick == 1;
 if can_rest {
-    print 400;
+    print "  Day off available";
 }
+print "";
 
-// Nested conditionals with NOT and comparisons
+print "Test 13: Grade Classification";
 score = 85;
 passing = 60;
+print "  Score: ";
+print score;
 
-if !(score < passing) {  // NOT (score < passing) = score >= passing
+if !(score < passing) {
     if score >= 90 {
-        print 500;  // A
+        print "  Grade: A";
     } else {
         if score >= 80 {
-            print 501;  // B
+            print "  Grade: B";
         } else {
-            print 502;  // C
+            print "  Grade: C";
         }
     }
 } else {
-    print 503;  // Fail
+    print "  Grade: F";
 }
+print "";
 
-// Nested loops with boolean operators, negation, and break/continue
+print "Test 14: Nested Loop Computation";
 i = 3;
 total = 0;
 
@@ -193,14 +221,12 @@ while i > 0 && i <= 5 {
     sum = 0;
 
     while j > 0 {
-        // Skip if j equals 1 in iteration when i is 4
         if i == 4 && j == 1 {
             j = j - 1;
             continue;
         }
 
-        // Use negation in calculation
-        value = -(i * -j);  // Simplifies to i * j
+        value = -(i * -j);
         sum = sum + value;
         j = j - 1;
     }
@@ -209,54 +235,65 @@ while i > 0 && i <= 5 {
     i = i + 1;
 }
 
-print total;  // Modified sum (skips i=4, j=1)
+print "  Nested loop result: ";
+print total;
+print "";
 
-// Safe division with error checking
+print "Test 15: Safe Division";
 numerator = 100;
 denominator = 5;
-
 result = safe_divide(numerator, denominator);
-print result;  // 20
+print "  100 / 5 = ";
+print result;
 
-// Division by zero test
 bad_result = safe_divide(10, 0);
-print bad_result;  // 0 (safe default)
+print "  10 / 0 = ";
+print bad_result;
+print "  (safe default)";
+print "";
 
-// Complex boolean expression with short-circuit
+print "Test 16: Short-Circuit Evaluation";
 a = 5;
 b = 10;
 c = 15;
 
-// (a < b AND b < c) OR a == 0
 if a < b && b < c || a == 0 {
-    print 600;
+    print "  Condition satisfied";
 }
+print "";
 
-// Double negation
+print "Test 17: Double Negation";
 flag = 5;
-result = !!flag;  // Any non-zero becomes 1
-print result;  // 1
+result = !!flag;
+print "  !!5 = ";
+print result;
+print "";
 
-// Using NOT with AND
+print "Test 18: NOT with AND";
 enabled = 1;
 locked = 0;
 
 if enabled == 1 && !locked {
-    print 700;
+    print "  Access granted";
 }
+print "";
 
-// Arithmetic with multiple negations
+print "Test 19: Negation Arithmetic";
 x = 5;
 y = -3;
-z = -x + -y;  // -5 + 3 = -2
+z = -x + -y;
+print "  -5 + -(-3) = ";
 print z;
+print "";
 
-// Comparison with negated values
+print "Test 20: Negated Comparisons";
 if -10 < -5 {
-    print 800;
+    print "  -10 < -5: true";
 }
+print "";
 
-// While loop with NOT condition
+print "Test 21: NOT Condition Loop";
+print "  Counting to 3:";
 done = 0;
 count = 0;
 while !done {
@@ -264,17 +301,23 @@ while !done {
     if count >= 3 {
         done = 1;
     }
+    print "    ";
     print count;
 }
+print "";
 
-// Subroutine calls in boolean expressions
+print "Test 22: Function Call in Boolean";
 if factorial(3) == 6 && abs(-10) == 10 {
-    print 900;
+    print "  Function results verified";
 }
+print "";
 
-// Final complex calculation
-final = factorial(4) / 4 + abs(-5) - -2;  // 24/4 + 5 + 2 = 13
+print "Test 23: Complex Expression";
+final = factorial(4) / 4 + abs(-5) - -2;
+print "  4!/4 + abs(-5) - (-2) = ";
 print final;
+print "";
 
-// End marker
+print "=== All Tests Complete ===";
+print "Test result marker: ";
 print 9999;

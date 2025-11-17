@@ -13,7 +13,7 @@ The language supports:
 - **Comparisons**: `==`, `!=`, `<`, `<=`, `>`, `>=` (return 1 for true, 0 for false)
 - **Boolean Logic**: `&&` (AND), `||` (OR) with short-circuit evaluation
 - **Control Flow**: `if` statements with optional `else` blocks, `while` loops, `break`, and `continue`
-- **Output**: `print` statement for displaying integers
+- **Output**: `print` statement for displaying integers and string literals
 - **Comments**: Single-line comments with `//`
 
 ## Syntax
@@ -90,6 +90,31 @@ if !(x < 0) && x < 100 {
     print x;
 }
 ```
+
+### Output
+
+The `print` statement can display both integers (from expressions) and string literals:
+
+```
+// Printing integers
+x = 42;
+print x;           // Prints: 42
+print 100 + 23;    // Prints: 123
+
+// Printing string literals
+print "Hello, World!";
+print "The answer is:";
+print x;
+
+// Empty strings
+print "";
+
+// Strings with special characters and spaces
+print "Score: 85";
+print "  Indented message";
+```
+
+**Note:** Each `print` statement outputs on its own line. String literals are stored in the `.data` section and printed using the `write` syscall.
 
 ### Conditionals
 ```
@@ -224,6 +249,7 @@ toy-compiler/
 │   ├── ast_walker.py     # AST walker utilities
 │   ├── var_utils.py      # Variable collection utilities
 │   ├── parser.py         # Parser and AST builder
+│   ├── asm_writer.py     # Assembly section writer
 │   ├── compiler.py       # Compiler (AST -> x86-64 assembly)
 │   └── cli.py            # Command-line interface
 ├── lib/
@@ -457,13 +483,46 @@ The `examples/` directory contains several programs demonstrating language featu
 - **boolean_ops.toy**: Boolean operators (`&&`, `||`) with short-circuit evaluation
 - **unary.toy**: Unary operators (negation `-`, logical NOT `!`)
 - **break_continue.toy**: Loop control flow with `break` and `continue` statements
+- **strings.toy**: String literal printing and mixing strings with integer output
 - **simple_sub.toy**: Basic subroutine with parameters and return value
 - **subroutines.toy**: Advanced subroutine features including recursion, void functions, and nested calls
-- **comprehensive.toy**: Complete feature showcase including all operators, subroutines, recursion, nested loops, conditionals, and control flow
+- **comprehensive.toy**: Complete feature showcase with narrative string output including all operators, subroutines, recursion, nested loops, conditionals, and control flow
 
 Each example has a corresponding `.expected` file for automated testing.
 
 ## Implementation Notes
+
+### String Literals
+
+String literals are compiled into the `.data` section of the assembly output:
+
+```asm
+section .data
+    ; "Hello, World!"
+    const.0: db "Hello, World!", 0
+    const.0_len equ $ - const.0
+```
+
+Each string constant includes:
+- A descriptive comment showing the string content
+- The string data with a null terminator
+- An automatically calculated length using `equ $ - label`
+
+String printing uses the Linux `write` syscall:
+
+```asm
+mov rax, 1              ; write syscall
+mov rdi, 1              ; stdout file descriptor
+mov rsi, const.0        ; string buffer address
+mov rdx, const.0_len    ; string length
+syscall
+```
+
+This approach:
+- Stores strings in read-only data section
+- Avoids runtime memory allocation
+- Uses direct syscalls for efficient output
+- Calculates string lengths at assemble time
 
 ### Stack Frame Convention
 

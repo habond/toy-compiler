@@ -50,8 +50,8 @@ def walk(node: ASTNode, skip: list[type[ASTNode]] | None = None) -> Iterator[AST
         case Assignment(value=value):
             yield from walk(value, skip)
 
-        case Print(expr=expr):
-            yield from walk(expr, skip)
+        case Print(value=value):
+            yield from walk(value, skip)
 
         case ReturnStmt(expr=expr):
             if expr:
@@ -88,6 +88,6 @@ def walk(node: ASTNode, skip: list[type[ASTNode]] | None = None) -> Iterator[AST
             for arg in args:
                 yield from walk(arg, skip)
 
-        case Var() | Number():
+        case Var() | Number() | String():
             # Leaf nodes - no children
             pass

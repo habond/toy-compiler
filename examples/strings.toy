@@ -1,0 +1,23 @@
+// Example demonstrating string literal printing
+
+print "Hello, World!";
+print "Welcome to the toy language";
+
+// Mix strings and expressions
+x = 42;
+print "The answer is:";
+print x;
+
+// Strings in control flow
+if x > 40 {
+    print "x is greater than 40";
+} else {
+    print "x is not greater than 40";
+}
+
+// Empty string
+print "";
+
+// String with special characters
+print "This is a test!";
+print "Numbers: 1 2 3";
