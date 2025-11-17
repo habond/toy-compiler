@@ -682,6 +682,7 @@ class Compiler:
                     case String(string_value):
                         if not string_value:  # Empty string is a no-op
                             return
+                        # Generate label only after confirming string is non-empty
                         (label,) = self.fresh_label_group("const")
                         self.emit(ASM_DATA_STRING.format(label=label, value=string_value), section="data")
                         self.emit("", section="data")
@@ -697,6 +698,7 @@ class Compiler:
                         if not string_value:  # Empty string: just print newline
                             self.emit(ASM_PRINT_NEWLINE)
                             return
+                        # Generate label only after confirming string is non-empty
                         (label,) = self.fresh_label_group("const")
                         self.emit(ASM_DATA_STRING.format(label=label, value=string_value), section="data")
                         self.emit("", section="data")
