@@ -37,110 +37,117 @@ class UnaryOpType(Enum):
 class ASTNode:
     """Base class for all AST nodes."""
 
-    pass
-
 
 # Statements
 @dataclass
 class Statement(ASTNode):
     """Base class for all statement nodes."""
 
-    pass
-
 
 @dataclass
 class Assignment(Statement):
+    """Variable assignment statement.
+
+    Assigns the result of an expression to a variable name.
+    """
+
     name: str
     value: "Expr"
-
-    def __str__(self) -> str:
-        return f"{self.name} = {self.value};"
 
 
 @dataclass
 class Print(Statement):
-    value: "Expr"
+    """Print statement without newline.
 
-    def __str__(self) -> str:
-        return f"print {self.value};"
+    Outputs the value of an expression to stdout without adding a newline.
+    """
+
+    value: "Expr"
 
 
 @dataclass
 class Println(Statement):
-    value: "Expr"
+    """Print statement with newline.
 
-    def __str__(self) -> str:
-        return f"println {self.value};"
+    Outputs the value of an expression to stdout followed by a newline.
+    """
+
+    value: "Expr"
 
 
 @dataclass
 class IfStmt(Statement):
+    """Conditional if/else statement.
+
+    Evaluates condition and executes then_body if true (non-zero),
+    otherwise executes else_body if present.
+    """
+
     condition: "Expr"
     then_body: list[Statement]
     else_body: list[Statement] | None = None
 
-    def __str__(self) -> str:
-        return f"if {self.condition}"
-
 
 @dataclass
 class WhileLoop(Statement):
+    """While loop statement.
+
+    Repeatedly evaluates condition and executes body while condition
+    is true (non-zero).
+    """
+
     condition: "Expr"
     body: list[Statement]
-
-    def __str__(self) -> str:
-        return f"while {self.condition}"
 
 
 @dataclass
 class ReturnStmt(Statement):
-    expr: "Expr"
+    """Return statement.
 
-    def __str__(self) -> str:
-        return f"return {self.expr};"
+    Returns a value from a subroutine and exits the subroutine.
+    """
+
+    expr: "Expr"
 
 
 @dataclass
 class Break(Statement):
     """Break statement - exits the innermost loop."""
 
-    def __str__(self) -> str:
-        return "break;"
-
 
 @dataclass
 class Continue(Statement):
     """Continue statement - skips to next iteration of innermost loop."""
 
-    def __str__(self) -> str:
-        return "continue;"
-
 
 @dataclass
 class CallStmt(Statement):
-    call: "Call"
+    """Statement wrapper for a function call expression."""
 
-    def __str__(self) -> str:
-        return f"{self.call};"
+    call: "Call"
 
 
 @dataclass
 class SubroutineDef(ASTNode):
+    """Function/subroutine definition.
+
+    Defines a callable subroutine with parameters and a body of statements.
+    """
+
     name: str
     params: list[str]
     body: list[Statement]
 
-    def __str__(self) -> str:
-        params_str = ", ".join(self.params)
-        return f"sub {self.name}({params_str})"
-
 
 @dataclass
 class Program(ASTNode):
-    top_level: list[ASTNode]  # Can be SubroutineDef or Statement
+    """Root node of the AST representing the entire program.
 
-    def __str__(self) -> str:
-        return "\n".join([str(item) for item in self.top_level])
+    Contains a list of top-level items which can be either subroutine
+    definitions or statements (executed in the main program scope).
+    """
+
+    top_level: list[ASTNode]  # Can be SubroutineDef or Statement
 
 
 # Expressions
@@ -148,39 +155,38 @@ class Program(ASTNode):
 class Expr(ASTNode):
     """Base class for expressions."""
 
-    pass
-
 
 @dataclass
 class Number(Expr):
-    value: int
+    """Integer literal expression."""
 
-    def __str__(self) -> str:
-        return str(self.value)
+    value: int
 
 
 @dataclass
 class String(Expr):
-    value: str
+    """String literal expression."""
 
-    def __str__(self) -> str:
-        return f'"{self.value}"'
+    value: str
 
 
 @dataclass
 class Var(Expr):
-    name: str
+    """Variable reference expression."""
 
-    def __str__(self) -> str:
-        return self.name
+    name: str
 
 
 @dataclass
 class BinOp(Expr):
     """Binary operation expression.
 
-    Supports arithmetic (+, -, *, /), comparison (==, !=, <, <=, >, >=),
-    and logical operators (&&, ||).
+    Represents operations on two operands with an operator in between.
+
+    Supported operators:
+    - Arithmetic: +, -, *, /
+    - Comparison: ==, !=, <, <=, >, >=
+    - Logical: &&, ||
 
     Note: Logical operators (&&, ||) use short-circuit evaluation:
     - &&: If left is false (0), returns 0 without evaluating right
@@ -191,15 +197,14 @@ class BinOp(Expr):
     left: Expr
     right: Expr
 
-    def __str__(self) -> str:
-        return f"({self.left} {self.op.value} {self.right})"
-
 
 @dataclass
 class UnaryOp(Expr):
     """Unary operation expression.
 
-    Supports:
+    Represents operations on a single operand with an operator prefix.
+
+    Supported operators:
     - Arithmetic negation (-): Returns the negative of the operand
     - Logical NOT (!): Returns 1 if operand is 0, otherwise returns 0
     """
@@ -207,15 +212,13 @@ class UnaryOp(Expr):
     op: UnaryOpType
     operand: Expr
 
-    def __str__(self) -> str:
-        return f"({self.op.value}{self.operand})"
-
 
 @dataclass
 class Call(Expr):
+    """Function/subroutine call expression.
+
+    Represents calling a subroutine with a list of argument expressions.
+    """
+
     name: str
     args: list[Expr]
-
-    def __str__(self) -> str:
-        args_str = ", ".join([str(arg) for arg in self.args])
-        return f"{self.name}({args_str})"

@@ -20,20 +20,10 @@ class ASTBuilder(Transformer):
 
     @v_args(inline=True)
     def print_stmt(self, value):
-        # If value is a STRING token, convert it to a String AST node
-        if hasattr(value, 'type') and value.type == 'STRING':
-            # Remove surrounding quotes from the token value
-            string_value = str(value).strip('"')
-            return Print(value=String(value=string_value))
         return Print(value=value)
 
     @v_args(inline=True)
     def println_stmt(self, value):
-        # If value is a STRING token, convert it to a String AST node
-        if hasattr(value, 'type') and value.type == 'STRING':
-            # Remove surrounding quotes from the token value
-            string_value = str(value).strip('"')
-            return Println(value=String(value=string_value))
         return Println(value=value)
 
     def if_stmt(self, items):
@@ -86,9 +76,10 @@ class ASTBuilder(Transformer):
         return Number(value=int(value))
 
     @v_args(inline=True)
-    def string(self, value):
-        # Remove the surrounding quotes from the string literal
-        return String(value=str(value)[1:-1])
+    def STRING(self, token):
+        # Transform STRING tokens into String AST nodes automatically
+        # This handles raw STRING tokens used in print/println statements
+        return String(value=str(token).strip('"'))
 
     @v_args(inline=True)
     def var(self, name):

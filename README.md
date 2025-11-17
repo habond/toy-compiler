@@ -249,8 +249,9 @@ print_range(1, 5);      // Prints: 1 2 3 4 5
 toy-compiler/
 ├── src/
 │   ├── grammar.lark      # Lark grammar definition
-│   ├── ast_nodes.py      # AST node class definitions
+│   ├── ast_nodes.py      # AST node class definitions (pure data classes)
 │   ├── ast_walker.py     # AST walker utilities
+│   ├── code_printer.py   # Convert AST back to source code
 │   ├── var_utils.py      # Variable collection utilities
 │   ├── parser.py         # Parser and AST builder
 │   ├── asm_writer.py     # Assembly section writer
@@ -313,25 +314,35 @@ python3 src/cli.py examples/hello.toy build/hello.asm
 ### Programmatic Usage
 
 ```python
-from parser import Parser
-from compiler import Compiler
+from src.parser import Parser
+from src.compiler import Compiler
+from src.code_printer import CodePrinter
 
 parser = Parser()
 compiler = Compiler()
+printer = CodePrinter()
 
 code = """
 // Simple program
 x = 42;
-print x;
+println x;
 """
 
 # Parse to AST
 ast = parser.parse(code)
-print(ast)
+
+# AST nodes are pure data classes - use default repr for debugging
+print("AST structure:", ast)
+# Output: Program(top_level=[Assignment(name='x', value=Number(value=42)), ...])
+
+# Convert AST back to source code using CodePrinter
+source = printer.print(ast)
+print("Source code:", source)
+# Output: x = 42;\nprintln x;
 
 # Compile to assembly
 asm = compiler.compile(ast)
-print(asm)
+print("Assembly:", asm[:100] + "...")
 ```
 
 ## Compiling and Running
@@ -495,6 +506,44 @@ The `examples/` directory contains several programs demonstrating language featu
 Each example has a corresponding `.expected` file for automated testing.
 
 ## Implementation Notes
+
+### AST Design Philosophy
+
+The AST (Abstract Syntax Tree) implementation follows a clean separation of concerns:
+
+**Pure Data Classes:**
+- AST nodes (`ast_nodes.py`) are pure dataclasses with no behavior
+- They only hold data - no methods for printing, compiling, or transforming
+- Default `__repr__` provides excellent debugging output automatically
+- Well-documented with clear docstrings explaining each node type
+
+**Separate Concerns:**
+- `CodePrinter` - Converts AST back to source code representation
+- `Compiler` - Transforms AST into x86-64 assembly
+- `ASTWalker` - Traverses AST for analysis (variable collection, etc.)
+
+**Benefits:**
+```python
+from src.parser import Parser
+from src.code_printer import CodePrinter
+
+ast = Parser().parse("x = 5; println x;")
+
+# Debugging: See full AST structure
+print(ast)
+# Program(top_level=[Assignment(name='x', value=Number(value=5)), Println(value=Var(name='x'))])
+
+# Code generation: Pretty-print source
+printer = CodePrinter()
+print(printer.print(ast))
+# x = 5;
+# println x;
+
+# Easy to add new representations without modifying AST nodes
+# Could add: MinifiedPrinter, JSONPrinter, GraphvizPrinter, etc.
+```
+
+This design keeps AST nodes simple and makes it easy to add new ways to process or display the AST without changing the core data structures.
 
 ### Compiler Architecture
 
