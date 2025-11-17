@@ -271,14 +271,24 @@ class Compiler:
     """
 
     data: SectionWriter
-    text: SectionWriter
+    text_top: SectionWriter  # Main program code (emitted at top of text section)
+    text_bottom: SectionWriter  # Subroutine code (emitted at bottom of text section)
     label_counter: int
     frame_metadata_stack: list[FrameMetadata]
 
     def __init__(self):
-        """Initialize the compiler with empty state."""
+        """Initialize the compiler with empty state.
+
+        The compiler uses two separate text section writers to control code layout:
+        - text_top: Holds the main program code and section header
+        - text_bottom: Holds all subroutine definitions
+
+        This separation ensures subroutines appear after the main program in the
+        final assembly output, improving readability.
+        """
         self.data = SectionWriter("data")
-        self.text = SectionWriter("text")
+        self.text_top = SectionWriter("text")  # Section header included
+        self.text_bottom = SectionWriter()  # No section header (appended to text_top)
         self.label_counter = 0
         self.frame_metadata_stack = []
 
@@ -308,8 +318,18 @@ class Compiler:
         if mode not in ("indented", "raw"):
             raise ValueError(f"Invalid mode '{mode}': must be 'indented' or 'raw'")
 
-        # Select the appropriate section writer
-        writer = self.text if section == "text" else self.data
+        # Select the appropriate section writer based on section and current context
+        if section == "data":
+            # Data section: string literals and constants
+            writer = self.data
+        elif len(self.frame_metadata_stack) <= 1:
+            # Main program context (frame_metadata_stack has 0 or 1 frames)
+            # Emit to top of text section (includes section header and _start)
+            writer = self.text_top
+        else:
+            # Subroutine context (frame_metadata_stack has 2+ frames)
+            # Emit to bottom of text section (subroutine definitions)
+            writer = self.text_bottom
 
         # Emit using the appropriate mode
         if mode == "indented":
@@ -389,17 +409,12 @@ class Compiler:
         """
         self.program(program)
 
-        # Assemble sections: data first, then text
-        sections = []
-
-        data_output = self.data.get_output()
-        if data_output:
-            sections.append(data_output)
-
-        text_output = self.text.get_output()
-        if text_output:
-            sections.append(text_output)
-
+        # Assemble sections in proper order: data, then text (main + subroutines)
+        # Filter out empty sections using a generator expression
+        sections = (
+            output for writer in (self.data, self.text_top, self.text_bottom)
+            if (output := writer.get_output())
+        )
         return "\n\n".join(sections)
 
     def program(self, program: Program) -> None:
@@ -452,8 +467,8 @@ class Compiler:
         self.emit("")
 
         # Emit statements and subroutines
-        # Subroutine definitions are compiled inline (with jump-over logic)
-        # Statements are executed in the main program flow
+        # Subroutine definitions are emitted to text_bottom (after main program)
+        # Statements are emitted to text_top (main program flow)
         for item in program.top_level:
             match item:
                 case SubroutineDef():
@@ -468,8 +483,9 @@ class Compiler:
     def compile_subroutine(self, subroutine: SubroutineDef) -> None:
         """Compile a subroutine definition.
 
-        Subroutines are compiled inline but with a jump-over wrapper so they don't
-        execute during normal program flow. They're only executed when called.
+        Subroutines are emitted to a separate text section writer (text_bottom) which
+        is appended after the main program. This ensures they don't execute during
+        normal program flow and only execute when called.
 
         Stack layout for subroutines:
             [rbp+24] - third parameter
@@ -488,7 +504,7 @@ class Compiler:
         body = subroutine.body
 
         # Generate labels for subroutine entry and skip-over jump
-        sub_start, sub_end = f"sub_{name}.start", f"sub_{name}.end"
+        sub_start = f"sub_{name}.start"
 
         # Collect local variables declared within the subroutine (parameters excluded)
         body_vars = collect_subroutine_local_variables(subroutine)
@@ -512,15 +528,13 @@ class Compiler:
         subroutine_var_offsets = param_offsets | local_offsets
 
         # Push new frame metadata onto stack (subroutine has its own scope)
+        # This causes emit() to route code to text_bottom instead of text_top
         frame_metadata = FrameMetadata(subroutine_var_offsets)
         self.frame_metadata_stack.append(frame_metadata)
 
-        # Emit subroutine header with jump-over to prevent inline execution
+        # Emit subroutine header (will be written to text_bottom section)
         self.emit("")
         self.emit(f"; ===== Subroutine: {name} =====")
-        self.emit(
-            ASM_JMP.format(label=sub_end)
-        )  # Skip over subroutine during main flow
         self.emit(
             ASM_LABEL.format(label=sub_start), mode="raw"
         )  # Entry point for CALL instruction
@@ -564,12 +578,12 @@ class Compiler:
         # This ensures proper cleanup even if control reaches end of subroutine
         self.emit(ASM_IMPLICIT_RETURN)
 
-        # Emit subroutine footer and skip-over target label
+        # Emit subroutine footer
         self.emit("")
         self.emit(f"; ===== End of {name} =====")
-        self.emit(ASM_LABEL.format(label=sub_end), mode="raw")  # Jump target for skip-over
 
         # Pop frame metadata (return to caller's scope)
+        # After this, emit() will route back to text_top
         self.frame_metadata_stack.pop()
         self.emit("")
 

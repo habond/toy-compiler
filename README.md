@@ -496,6 +496,44 @@ Each example has a corresponding `.expected` file for automated testing.
 
 ## Implementation Notes
 
+### Compiler Architecture
+
+The compiler uses a multi-section approach to generate clean, organized assembly output:
+
+**Section Writers:**
+- `data`: Holds string literals and constants (`.data` section)
+- `text_top`: Holds the main program code with section header (`.text` section)
+- `text_bottom`: Holds subroutine definitions (appended to `.text` section)
+
+**Code Organization:**
+
+The compiler automatically routes emitted code to the appropriate section based on context:
+- When compiling the main program (`frame_metadata_stack` has 0-1 frames), code goes to `text_top`
+- When compiling subroutines (`frame_metadata_stack` has 2+ frames), code goes to `text_bottom`
+- String literals always go to `data` section
+
+This creates a natural assembly layout:
+```asm
+section .data
+    ; String constants
+
+section .text
+    ; Main program (_start)
+    ; ...
+    ; Exit code
+
+    ; Subroutine definitions
+    sub_name.start:
+    ; ...
+    ret
+```
+
+**Benefits:**
+- Subroutines appear after main program for better readability
+- No jump-over wrappers needed (cleaner assembly)
+- Natural separation between main logic and function definitions
+- Easy to locate and debug specific code sections
+
 ### String Literals
 
 String literals are compiled into the `.data` section of the assembly output:
