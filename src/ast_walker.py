@@ -53,6 +53,9 @@ def walk(node: ASTNode, skip: list[type[ASTNode]] | None = None) -> Iterator[AST
         case Print(value=value):
             yield from walk(value, skip)
 
+        case Println(value=value):
+            yield from walk(value, skip)
+
         case ReturnStmt(expr=expr):
             if expr:
                 yield from walk(expr, skip)

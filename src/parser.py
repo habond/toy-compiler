@@ -27,6 +27,15 @@ class ASTBuilder(Transformer):
             return Print(value=String(value=string_value))
         return Print(value=value)
 
+    @v_args(inline=True)
+    def println_stmt(self, value):
+        # If value is a STRING token, convert it to a String AST node
+        if hasattr(value, 'type') and value.type == 'STRING':
+            # Remove surrounding quotes from the token value
+            string_value = str(value).strip('"')
+            return Println(value=String(value=string_value))
+        return Println(value=value)
+
     def if_stmt(self, items):
         condition = items[0]
         then_body = items[1]

@@ -22,7 +22,7 @@ sub calculate(a, b, c) {
 sub print_range(start, end) {
     current = start;
     while current <= end {
-        print current;
+        println current;
         current = current + 1;
     }
 }
@@ -39,15 +39,15 @@ sub factorial(n) {
 
 // Main program
 x = add(10, 20);
-print x;
+println x;
 
 y = multiply(5, 6);
-print y;
+println y;
 
 z = calculate(2, 3, 4);
-print z;
+println z;
 
 print_range(1, 5);
 
 fact5 = factorial(5);
-print fact5;
+println fact5;

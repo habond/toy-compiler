@@ -4,42 +4,42 @@ y = 10;
 
 // Equality
 result = x == y;
-print result;
+println result;
 
 result = x != y;
-print result;
+println result;
 
 // Less than
 result = x < y;
-print result;
+println result;
 
 result = y < x;
-print result;
+println result;
 
 // Less than or equal
 result = x <= y;
-print result;
+println result;
 
 result = x <= 5;
-print result;
+println result;
 
 // Greater than
 result = x > y;
-print result;
+println result;
 
 result = y > x;
-print result;
+println result;
 
 // Greater than or equal
 result = y >= x;
-print result;
+println result;
 
 result = x >= 5;
-print result;
+println result;
 
 // Complex expressions
 result = x + 1 < y - 2;
-print result;
+println result;
 
 result = x * 2 == y;
-print result;
+println result;

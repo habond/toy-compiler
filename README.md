@@ -13,7 +13,7 @@ The language supports:
 - **Comparisons**: `==`, `!=`, `<`, `<=`, `>`, `>=` (return 1 for true, 0 for false)
 - **Boolean Logic**: `&&` (AND), `||` (OR) with short-circuit evaluation
 - **Control Flow**: `if` statements with optional `else` blocks, `while` loops, `break`, and `continue`
-- **Output**: `print` statement for displaying integers and string literals
+- **Output**: `print` (no newline) and `println` (with newline) for displaying integers and string literals
 - **Comments**: Single-line comments with `//`
 
 ## Syntax
@@ -93,28 +93,32 @@ if !(x < 0) && x < 100 {
 
 ### Output
 
-The `print` statement can display both integers (from expressions) and string literals:
+The language provides two output statements:
+- `print` - outputs WITHOUT a newline (stays on same line)
+- `println` - outputs WITH a newline (moves to next line)
 
 ```
+// Print without newline, println with newline
+print "Score: ";
+println 85;           // Output: "Score: 85\n"
+
+println "Hello!";     // Output: "Hello!\n"
+print "World";        // Output: "World" (no newline)
+
 // Printing integers
 x = 42;
-print x;           // Prints: 42
-print 100 + 23;    // Prints: 123
+println x;            // Prints: 42\n
+println 100 + 23;     // Prints: 123\n
 
-// Printing string literals
-print "Hello, World!";
-print "The answer is:";
-print x;
+// Blank lines
+println "";           // Prints a blank line
 
-// Empty strings
-print "";
-
-// Strings with special characters and spaces
-print "Score: 85";
-print "  Indented message";
+// Combining for formatted output
+print "  Result = ";
+println value;        // Output: "  Result = <value>\n"
 ```
 
-**Note:** Each `print` statement outputs on its own line. String literals are stored in the `.data` section and printed using the `write` syscall.
+**Note:** String literals are stored in the `.data` section and printed using the `write` syscall.
 
 ### Conditionals
 ```
@@ -483,7 +487,7 @@ The `examples/` directory contains several programs demonstrating language featu
 - **boolean_ops.toy**: Boolean operators (`&&`, `||`) with short-circuit evaluation
 - **unary.toy**: Unary operators (negation `-`, logical NOT `!`)
 - **break_continue.toy**: Loop control flow with `break` and `continue` statements
-- **strings.toy**: String literal printing and mixing strings with integer output
+- **strings.toy**: String literal printing demonstrating `print` (no newline) and `println` (with newline)
 - **simple_sub.toy**: Basic subroutine with parameters and return value
 - **subroutines.toy**: Advanced subroutine features including recursion, void functions, and nested calls
 - **comprehensive.toy**: Complete feature showcase with narrative string output including all operators, subroutines, recursion, nested loops, conditionals, and control flow
@@ -499,30 +503,35 @@ String literals are compiled into the `.data` section of the assembly output:
 ```asm
 section .data
     ; "Hello, World!"
-    const.0: db "Hello, World!", 0
+    const.0: db "Hello, World!"
     const.0_len equ $ - const.0
 ```
 
 Each string constant includes:
 - A descriptive comment showing the string content
-- The string data with a null terminator
+- The string data (without null terminator)
 - An automatically calculated length using `equ $ - label`
 
 String printing uses the Linux `write` syscall:
 
 ```asm
+; print (no newline)
 mov rax, 1              ; write syscall
 mov rdi, 1              ; stdout file descriptor
 mov rsi, const.0        ; string buffer address
 mov rdx, const.0_len    ; string length
 syscall
+
+; println (with newline) adds:
+call print_newline      ; Outputs newline character
 ```
 
 This approach:
-- Stores strings in read-only data section
+- Stores strings in read-only data section (without newlines)
 - Avoids runtime memory allocation
 - Uses direct syscalls for efficient output
 - Calculates string lengths at assemble time
+- Separates newline control from string content (`print` vs `println`)
 
 ### Stack Frame Convention
 

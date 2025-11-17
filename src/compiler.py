@@ -31,7 +31,7 @@ _start:
 # --- Data Section ---
 ASM_DATA_STRING = """
 ; "{value}"
-{label}: db "{value}", 10
+{label}: db "{value}"
 {label}_len equ $ - {label}
 """
 
@@ -67,6 +67,11 @@ mov qword [rbp{offset:+d}], rax
 ASM_PRINT_INT = """
 pop rdi
 call print_int
+"""
+
+ASM_PRINTLN_INT = """
+pop rdi
+call print_int
 call print_newline
 """
 
@@ -76,6 +81,15 @@ mov rdi, 1            ; stdout file descriptor
 mov rsi, {label}      ; string buffer address
 mov rdx, {label}_len  ; string length
 syscall
+"""
+
+ASM_PRINTLN_STRING = """
+mov rax, 1            ; write syscall
+mov rdi, 1            ; stdout file descriptor
+mov rsi, {label}      ; string buffer address
+mov rdx, {label}_len  ; string length
+syscall
+call print_newline
 """
 
 # --- Expressions: Literals and Variables ---
@@ -611,7 +625,7 @@ class Compiler:
                 self.pop_loop_labels()
 
             case Print(value):
-                # Evaluate expression and print result
+                # Print without newline
                 match value:
                     case String(string_value):
                         (label,) = self.fresh_label_group("const")
@@ -621,6 +635,18 @@ class Compiler:
                     case Expr():
                         self.expr(value)
                         self.text.emit(ASM_PRINT_INT)
+
+            case Println(value):
+                # Print with newline
+                match value:
+                    case String(string_value):
+                        (label,) = self.fresh_label_group("const")
+                        self.data.emit(ASM_DATA_STRING.format(label=label, value=string_value))
+                        self.data.emit("")
+                        self.text.emit(ASM_PRINTLN_STRING.format(label=label))
+                    case Expr():
+                        self.expr(value)
+                        self.text.emit(ASM_PRINTLN_INT)
 
             case ReturnStmt(expr):
                 # Evaluate return expression and return from subroutine

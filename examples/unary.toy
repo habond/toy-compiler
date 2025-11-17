@@ -4,24 +4,24 @@
 
 // Negate literal
 x = -5;
-print x;
+println x;
 
 // Negate positive variable
 a = 10;
 b = -a;
-print b;
+println b;
 
 // Double negation
 c = --5;
-print c;
+println c;
 
 // Negation in expression
 result = -5 + 3;
-print result;
+println result;
 
 // Negation with multiplication
 result = -2 * 3;
-print result;
+println result;
 
 // Negate function result
 sub get_value() {
@@ -29,72 +29,72 @@ sub get_value() {
 }
 
 negated = -get_value();
-print negated;
+println negated;
 
 // ===== Logical NOT (!) =====
 
 // NOT on false (0)
 x = !0;
-print x;
+println x;
 
 // NOT on true (non-zero)
 y = !1;
-print y;
+println y;
 
 z = !5;
-print z;
+println z;
 
 // Double NOT
 w = !!1;
-print w;
+println w;
 
 // NOT with comparisons
 result = !(5 > 10);
-print result;
+println result;
 
 result = !(3 == 3);
-print result;
+println result;
 
 // NOT in conditionals
 flag = 0;
 if !flag {
-    print 100;
+    println 100;
 }
 
 flag = 1;
 if !flag {
-    print 200;  // Should not print
+    println 200;  // Should not print
 }
 
 // ===== Combining Unary with Boolean Operators =====
 
 // NOT with AND
 result = !0 && !0;
-print result;
+println result;
 
 result = !1 && !0;
-print result;
+println result;
 
 // NOT with OR
 result = !0 || !1;
-print result;
+println result;
 
 result = !1 || !1;
-print result;
+println result;
 
 // Complex: NOT of compound expression
 a = 5;
 b = 10;
 result = !(a > b);
-print result;
+println result;
 
 result = !(a < b);
-print result;
+println result;
 
 // NOT in while loop
 counter = 0;
 while !counter {
-    print 999;
+    println 999;
     counter = 1;  // Exit after one iteration
 }
 
@@ -102,51 +102,51 @@ while !counter {
 
 // Negation with addition/subtraction
 result = -5 + -3;
-print result;
+println result;
 
 result = -10 - -5;
-print result;
+println result;
 
 // Negation in comparison
 x = -5;
 y = -3;
 result = x < y;
-print result;
+println result;
 
 // Complex expression
 result = -2 * 3 + -4;
-print result;
+println result;
 
 // ===== Edge Cases =====
 
 // Negation of zero
 zero = 0;
 result = -zero;
-print result;
+println result;
 
 // NOT of zero (should be 1)
 result = !zero;
-print result;
+println result;
 
 // Chained negations
 result = ---5;
-print result;
+println result;
 
 // Chained NOTs
 result = !!!0;
-print result;
+println result;
 
 // Negation and NOT together
 result = -!5;  // !5 = 0, -0 = 0
-print result;
+println result;
 
 result = !-5;  // -5 = -5 (truthy), !-5 = 0
-print result;
+println result;
 
 // Final test: all together
 x = 10;
 if !(x < 0) && x > 5 {
-    print 777;
+    println 777;
 }
 
-print 9999;
+println 9999;

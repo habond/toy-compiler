@@ -8,7 +8,7 @@ while x < 10 {
     if x == 5 {
         break;
     }
-    print x;
+    println x;
     x = x + 1;
 }
 
@@ -21,7 +21,7 @@ while counter < 5 {
     if counter == 2 || counter == 4 {
         continue;
     }
-    print counter;
+    println counter;
 }
 
 // ===== Break with Condition =====
@@ -30,7 +30,7 @@ while counter < 5 {
 num = 1;
 while num < 100 {
     if num - num / 7 * 7 == 0 {
-        print num;
+        println num;
         break;
     }
     num = num + 1;
@@ -48,7 +48,7 @@ while i < 10 {
     if i == 6 {
         continue;
     }
-    print i;
+    println i;
 }
 
 // ===== Nested Loops with Break (outer loop) =====
@@ -61,10 +61,10 @@ while outer < 3 {
         if inner == 3 {
             break;  // Breaks inner loop only
         }
-        print inner;
+        println inner;
         inner = inner + 1;
     }
-    print 100;  // Should print 3 times
+    println 100;  // Should println 3 times
     outer = outer + 1;
 }
 
@@ -79,9 +79,9 @@ while a < 3 {
         if b == 2 {
             continue;  // Skip when b == 2
         }
-        print b;
+        println b;
     }
-    print 200;
+    println 200;
     a = a + 1;
 }
 
@@ -102,7 +102,7 @@ while n < 20 {
         break;
     }
 
-    print n;
+    println n;
 }
 
 // ===== Break in Loop with Boolean Condition =====
@@ -114,7 +114,7 @@ found = 0;
 
 while value < 100 && !found {
     if value == target {
-        print value;
+        println value;
         found = 1;
         break;
     }
@@ -130,7 +130,7 @@ while x < 6 {
     if !(x == 2 || x == 5) {
         continue;  // Skip everything except 2 and 5
     }
-    print x;
+    println x;
 }
 
 // ===== Infinite Loop with Break =====
@@ -142,8 +142,8 @@ while 1 {
     if count > 3 {
         break;
     }
-    print count;
+    println count;
 }
 
 // ===== End Marker =====
-print 9999;
+println 9999;

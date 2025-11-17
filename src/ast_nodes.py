@@ -59,12 +59,18 @@ class Assignment(Statement):
 
 @dataclass
 class Print(Statement):
-    value: "Expr | str"
+    value: "Expr"
 
     def __str__(self) -> str:
-        if isinstance(self.value, str):
-            return f'print "{self.value}";'
         return f"print {self.value};"
+
+
+@dataclass
+class Println(Statement):
+    value: "Expr"
+
+    def __str__(self) -> str:
+        return f"println {self.value};"
 
 
 @dataclass

@@ -2,21 +2,21 @@
 x = 5;
 
 while x {
-    print x;
+    println x;
     x = x - 1;
 }
 
-print 0;
+println 0;
 
 // Nested loop
 i = 3;
 while i {
     j = 2;
     while j {
-        print j;
+        println j;
         j = j - 1;
     }
     i = i - 1;
 }
 
-print 999;
+println 999;

@@ -1,8 +1,8 @@
 // Comprehensive example demonstrating all language features
 // This program is a mathematical computation library with test output
 
-print "=== Mathematical Computation Library ===";
-print "";
+println "=== Mathematical Computation Library ===";
+println "";
 
 // ===== Utility Subroutines =====
 
@@ -73,82 +73,82 @@ sub count_skip_threes(start, end) {
 
 // ===== Test Suite =====
 
-print "Test 1: Absolute Value";
+println "Test 1: Absolute Value";
 x = -15;
 abs_x = abs(x);
 print "  abs(-15) = ";
-print abs_x;
+println abs_x;
 
 y = 10;
 abs_y = abs(y);
 print "  abs(10) = ";
-print abs_y;
-print "";
+println abs_y;
+println "";
 
-print "Test 2: Range Checking";
+println "Test 2: Range Checking";
 age = 25;
 min_age = 18;
 max_age = 65;
-print "  Is age 25 in range [18, 65]?";
+println "  Is age 25 in range [18, 65]?";
 if in_range(age, min_age, max_age) {
-    print "  Yes, in range";
+    println "  Yes, in range";
 } else {
-    print "  No, out of range";
+    println "  No, out of range";
 }
-print "";
+println "";
 
-print "Test 3: Expression Evaluation";
+println "Test 3: Expression Evaluation";
 val = -5 + 3 * 2;
 print "  -5 + 3 * 2 = ";
-print val;
-print "";
+println val;
+println "";
 
-print "Test 4: Error Checking";
+println "Test 4: Error Checking";
 has_error = 0;
 if !has_error {
-    print "  System status: OK";
+    println "  System status: OK";
 }
-print "";
+println "";
 
-print "Test 5: Factorial Computation";
+println "Test 5: Factorial Computation";
 fact3 = factorial(3);
 fact4 = factorial(4);
 print "  3! = ";
-print fact3;
+println fact3;
 print "  4! = ";
-print fact4;
+println fact4;
 
 if fact4 > fact3 {
-    print "  Verification: 4! > 3!";
+    println "  Verification: 4! > 3!";
 }
-print "";
+println "";
 
-print "Test 6: Even Number Filter";
-print "  Even numbers from 5 to 1:";
+println "Test 6: Even Number Filter";
+println "  Even numbers from 5 to 1:";
 counter = 5;
 while counter > 0 {
     if is_even(counter) {
         print "    ";
-        print counter;
+        println counter;
     }
     counter = counter - 1;
 }
-print "";
+println "";
 
-print "Test 7: Divisibility Search";
-print "  First multiple of 7 in [1, 20]: ";
+println "Test 7: Divisibility Search";
+println "  First multiple of 7 in [1, 20]: ";
 first_div_7 = find_divisible(1, 20, 7);
-print first_div_7;
-print "";
+println first_div_7;
+println "";
 
-print "Test 8: Skip Counter (continue)";
-print "  Count 1-10 skipping multiples of 3: ";
+println "Test 8: Skip Counter (continue)";
+println "  Count 1-10 skipping multiples of 3: ";
 count = count_skip_threes(1, 10);
-print count;
-print "";
+println count;
+println "";
 
-print "Test 9: Search with Break";
-print "  Find first number > 50:";
+println "Test 9: Search with Break";
+println "  Find first number > 50:";
 search = 0;
 while 1 {
     search = search + 1;
@@ -157,11 +157,11 @@ while 1 {
     }
 }
 print "    ";
-print search;
-print "";
+println search;
+println "";
 
-print "Test 10: Odd Number Filter (continue)";
-print "  Odd numbers 1 to 5:";
+println "Test 10: Odd Number Filter (continue)";
+println "  Odd numbers 1 to 5:";
 num = 0;
 while num < 6 {
     num = num + 1;
@@ -169,50 +169,50 @@ while num < 6 {
         continue;
     }
     print "    ";
-    print num;
+    println num;
 }
-print "";
+println "";
 
-print "Test 11: Boolean AND Logic";
+println "Test 11: Boolean AND Logic";
 x = 10;
 y = 20;
 if x > 0 && x < 100 && y > 0 && y < 100 {
-    print "  Both values in valid range";
+    println "  Both values in valid range";
 }
-print "";
+println "";
 
-print "Test 12: Boolean OR Logic";
+println "Test 12: Boolean OR Logic";
 weekend = 0;
 vacation = 1;
 sick = 0;
 can_rest = weekend == 1 || vacation == 1 || sick == 1;
 if can_rest {
-    print "  Day off available";
+    println "  Day off available";
 }
-print "";
+println "";
 
-print "Test 13: Grade Classification";
+println "Test 13: Grade Classification";
 score = 85;
 passing = 60;
-print "  Score: ";
-print score;
+println "  Score: ";
+println score;
 
 if !(score < passing) {
     if score >= 90 {
-        print "  Grade: A";
+        println "  Grade: A";
     } else {
         if score >= 80 {
-            print "  Grade: B";
+            println "  Grade: B";
         } else {
-            print "  Grade: C";
+            println "  Grade: C";
         }
     }
 } else {
-    print "  Grade: F";
+    println "  Grade: F";
 }
-print "";
+println "";
 
-print "Test 14: Nested Loop Computation";
+println "Test 14: Nested Loop Computation";
 i = 3;
 total = 0;
 
@@ -235,65 +235,65 @@ while i > 0 && i <= 5 {
     i = i + 1;
 }
 
-print "  Nested loop result: ";
-print total;
-print "";
+println "  Nested loop result: ";
+println total;
+println "";
 
-print "Test 15: Safe Division";
+println "Test 15: Safe Division";
 numerator = 100;
 denominator = 5;
 result = safe_divide(numerator, denominator);
 print "  100 / 5 = ";
-print result;
+println result;
 
 bad_result = safe_divide(10, 0);
 print "  10 / 0 = ";
-print bad_result;
-print "  (safe default)";
-print "";
+println bad_result;
+println "  (safe default)";
+println "";
 
-print "Test 16: Short-Circuit Evaluation";
+println "Test 16: Short-Circuit Evaluation";
 a = 5;
 b = 10;
 c = 15;
 
 if a < b && b < c || a == 0 {
-    print "  Condition satisfied";
+    println "  Condition satisfied";
 }
-print "";
+println "";
 
-print "Test 17: Double Negation";
+println "Test 17: Double Negation";
 flag = 5;
 result = !!flag;
 print "  !!5 = ";
-print result;
-print "";
+println result;
+println "";
 
-print "Test 18: NOT with AND";
+println "Test 18: NOT with AND";
 enabled = 1;
 locked = 0;
 
 if enabled == 1 && !locked {
-    print "  Access granted";
+    println "  Access granted";
 }
-print "";
+println "";
 
-print "Test 19: Negation Arithmetic";
+println "Test 19: Negation Arithmetic";
 x = 5;
 y = -3;
 z = -x + -y;
 print "  -5 + -(-3) = ";
-print z;
-print "";
+println z;
+println "";
 
-print "Test 20: Negated Comparisons";
+println "Test 20: Negated Comparisons";
 if -10 < -5 {
-    print "  -10 < -5: true";
+    println "  -10 < -5: true";
 }
-print "";
+println "";
 
-print "Test 21: NOT Condition Loop";
-print "  Counting to 3:";
+println "Test 21: NOT Condition Loop";
+println "  Counting to 3:";
 done = 0;
 count = 0;
 while !done {
@@ -302,22 +302,22 @@ while !done {
         done = 1;
     }
     print "    ";
-    print count;
+    println count;
 }
-print "";
+println "";
 
-print "Test 22: Function Call in Boolean";
+println "Test 22: Function Call in Boolean";
 if factorial(3) == 6 && abs(-10) == 10 {
-    print "  Function results verified";
+    println "  Function results verified";
 }
-print "";
+println "";
 
-print "Test 23: Complex Expression";
+println "Test 23: Complex Expression";
 final = factorial(4) / 4 + abs(-5) - -2;
 print "  4!/4 + abs(-5) - (-2) = ";
-print final;
-print "";
+println final;
+println "";
 
-print "=== All Tests Complete ===";
-print "Test result marker: ";
-print 9999;
+println "=== All Tests Complete ===";
+println "Test result marker: ";
+println 9999;
