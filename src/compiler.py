@@ -93,6 +93,8 @@ syscall
 call print_newline
 """
 
+ASM_PRINT_NEWLINE = "call print_newline"
+
 # --- Expressions: Literals and Variables ---
 ASM_PUSH_NUMBER = "push qword {num}"
 
@@ -678,6 +680,8 @@ class Compiler:
                 # Print without newline
                 match value:
                     case String(string_value):
+                        if not string_value:  # Empty string is a no-op
+                            return
                         (label,) = self.fresh_label_group("const")
                         self.emit(ASM_DATA_STRING.format(label=label, value=string_value), section="data")
                         self.emit("", section="data")
@@ -690,6 +694,9 @@ class Compiler:
                 # Print with newline
                 match value:
                     case String(string_value):
+                        if not string_value:  # Empty string: just print newline
+                            self.emit(ASM_PRINT_NEWLINE)
+                            return
                         (label,) = self.fresh_label_group("const")
                         self.emit(ASM_DATA_STRING.format(label=label, value=string_value), section="data")
                         self.emit("", section="data")
