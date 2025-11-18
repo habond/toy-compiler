@@ -1,6 +1,6 @@
 // Simple toy language grammar
 
-?start: top_level+
+start: top_level+
 
 ?top_level: subroutine_def
           | statement

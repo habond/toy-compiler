@@ -55,7 +55,7 @@ class CodePrinter:
                 result += "\n".join(self.print(stmt, indent + 1) for stmt in then_body)
                 result += f"\n{indent_str}}}"
                 if else_body:
-                    result += f" else {{\n"
+                    result += " else {\n"
                     result += "\n".join(self.print(stmt, indent + 1) for stmt in else_body)
                     result += f"\n{indent_str}}}"
                 return result

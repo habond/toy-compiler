@@ -257,6 +257,15 @@ toy-compiler/
 │   ├── asm_writer.py     # Assembly section writer
 │   ├── compiler.py       # Compiler (AST -> x86-64 assembly)
 │   └── cli.py            # Command-line interface
+├── tests/                # Comprehensive unit test suite
+│   ├── test_ast_nodes.py    # Tests for AST node definitions
+│   ├── test_parser.py       # Tests for parser and AST building
+│   ├── test_code_printer.py # Tests for code printing
+│   ├── test_compiler.py     # Tests for assembly generation
+│   ├── test_ast_walker.py   # Tests for AST traversal
+│   ├── test_var_utils.py    # Tests for variable utilities
+│   ├── test_asm_writer.py   # Tests for assembly writer
+│   └── test_cli.py          # Tests for CLI interface
 ├── lib/
 │   └── printf.asm        # Assembly helper for printing
 ├── examples/             # Example programs with expected outputs
@@ -282,7 +291,8 @@ toy-compiler/
 ├── Dockerfile            # Docker image for NASM + ld
 ├── compile.sh            # Build script (compile -> assemble -> link -> test)
 ├── Makefile              # Convenient build commands
-└── requirements.txt
+├── requirements.txt      # Core dependencies (lark)
+└── requirements-dev.txt  # Development dependencies (pytest, ruff, mypy)
 ```
 
 ## Setup
@@ -297,7 +307,11 @@ source .venv/bin/activate  # On macOS/Linux
 
 2. Install dependencies:
 ```bash
+# Core dependencies (required for running the compiler)
 pip install -r requirements.txt
+
+# Development dependencies (required for testing and linting)
+pip install -r requirements-dev.txt
 ```
 
 ## Usage
@@ -443,9 +457,48 @@ docker run --rm -v $(pwd):/workspace toy-compiler \
 
 ## Testing
 
+The project includes two types of testing:
+
+### 1. Unit Tests (Python)
+
+The project has a comprehensive unit test suite covering all compiler components. Tests are written using `pytest` and located in the `tests/` directory.
+
+**Running Unit Tests:**
+
+```bash
+# Run all tests
+pytest
+
+# Run tests with verbose output
+pytest -v
+
+# Run a specific test file
+pytest tests/test_parser.py
+
+# Run a specific test function
+pytest tests/test_parser.py::TestParser::test_simple_assignment
+
+# Run tests with coverage
+pytest --cov=src --cov-report=term-missing
+```
+
+**Test Coverage:**
+
+The test suite includes comprehensive tests for:
+- **test_ast_nodes.py**: AST node creation and source location tracking
+- **test_parser.py**: Parsing all language constructs
+- **test_code_printer.py**: Converting AST back to source code
+- **test_compiler.py**: Assembly code generation
+- **test_ast_walker.py**: AST traversal utilities
+- **test_var_utils.py**: Variable collection and analysis
+- **test_asm_writer.py**: Assembly section writer
+- **test_cli.py**: Command-line interface
+
+### 2. Integration Tests (Examples)
+
 The project includes automated testing support via `.expected` files that contain the expected output for each example program.
 
-### Running Tests
+**Running Integration Tests:**
 
 ```bash
 # Test a single example
@@ -460,14 +513,14 @@ for example in examples/*.toy; do
 done
 ```
 
-### How Testing Works
+**How Integration Testing Works:**
 
 1. The `--test` flag compiles and runs the program
 2. Captures the actual output
 3. Compares it with the corresponding `.expected` file
 4. Reports `✓ TEST PASSED` or `✗ TEST FAILED` with a diff
 
-### Adding New Test Cases
+**Adding New Integration Test Cases:**
 
 To add a new test case:
 
@@ -528,6 +581,13 @@ The AST (Abstract Syntax Tree) implementation follows a clean separation of conc
 - `SourceLocation` captures file, line, column, end_line, and end_column
 - Automatically populated during parsing via the `@with_location` decorator
 - Enables precise error messages, IDE features, and code quality tools
+
+**Parser Implementation:**
+- Uses Lark's `Transformer` class to build AST from parse tree
+- The `@with_location` decorator automatically attaches source locations to AST nodes
+- Transformer methods receive `children: list` parameter containing parsed child nodes
+- Token transformers (`NAME`, `NUMBER`, `STRING`) convert tokens to appropriate Python types
+- Type annotations provide clear documentation of expected node types
 
 **Benefits:**
 ```python
@@ -695,8 +755,24 @@ This convention provides:
 
 ## Requirements
 
+### Runtime Requirements
+
 - **Docker**: Required for assembly and linking (NASM + binutils)
 - **Python 3.10+**: For the compiler itself (uses match/case syntax)
 - **Make**: Optional, for convenient commands
+- **lark**: Parser generator library (installed via requirements.txt)
+
+### Development Requirements
+
+For development and testing, additional tools are required:
+
+- **pytest**: Unit testing framework
+- **ruff**: Fast Python linter and code formatter
+- **mypy**: Static type checker
+
+Install development dependencies with:
+```bash
+pip install -r requirements-dev.txt
+```
 
 The generated assembly targets **Linux x86-64** with direct syscalls, so it must run in a Linux environment (provided by Docker).

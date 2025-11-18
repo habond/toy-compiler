@@ -414,7 +414,8 @@ class Compiler:
         # Assemble sections in proper order: data, then text (main + subroutines)
         # Filter out empty sections using a generator expression
         sections = (
-            output for writer in (self.data, self.text_top, self.text_bottom)
+            output
+            for writer in (self.data, self.text_top, self.text_bottom)
             if (output := writer.get_output())
         )
         return "\n\n".join(sections)
@@ -438,9 +439,7 @@ class Compiler:
 
         # Calculate stack offsets for each variable (negative offsets = below rbp)
         # Variables are indexed: rbp-8, rbp-16, rbp-24, etc.
-        var_offsets = {
-            var: (-((idx + 1) * BYTES_PER_QWORD)) for (idx, var) in enumerate(vars)
-        }
+        var_offsets = {var: (-((idx + 1) * BYTES_PER_QWORD)) for (idx, var) in enumerate(vars)}
 
         # Create frame metadata and push onto stack (this is the main program's frame)
         frame_metadata = FrameMetadata(var_offsets)
@@ -462,9 +461,7 @@ class Compiler:
 
         # Allocate stack space for all main program variables
         self.emit(
-            ASM_VAR_ALLOC.format(
-                vars=", ".join(vars), byte_count=byte_count, var_count=var_count
-            )
+            ASM_VAR_ALLOC.format(vars=", ".join(vars), byte_count=byte_count, var_count=var_count)
         )
         self.emit("")
 
@@ -514,8 +511,7 @@ class Compiler:
         # Calculate offsets for parameters (positive offsets, above rbp)
         # First parameter is at rbp+16, second at rbp+24, etc.
         param_offsets = {
-            var: ((idx + PARAM_OFFSET_START) * BYTES_PER_QWORD)
-            for (idx, var) in enumerate(params)
+            var: ((idx + PARAM_OFFSET_START) * BYTES_PER_QWORD) for (idx, var) in enumerate(params)
         }
 
         # Calculate offsets for local variables (negative offsets, below rbp)
@@ -537,9 +533,7 @@ class Compiler:
         # Emit subroutine header (will be written to text_bottom section)
         self.emit("")
         self.emit(f"; ===== Subroutine: {name} =====")
-        self.emit(
-            ASM_LABEL.format(label=sub_start), mode="raw"
-        )  # Entry point for CALL instruction
+        self.emit(ASM_LABEL.format(label=sub_start), mode="raw")  # Entry point for CALL instruction
 
         # Set up stack frame (save caller's rbp, establish new frame)
         self.emit(ASM_FRAME_SETUP)
@@ -615,9 +609,7 @@ class Compiler:
 
             case IfStmt(condition, then_body, else_body):
                 # Generate unique labels for if/else/fi branches
-                if_label, else_label, fi_label = self.fresh_label_group(
-                    "if", "else", "fi"
-                )
+                if_label, else_label, fi_label = self.fresh_label_group("if", "else", "fi")
                 self.emit("; If statement")
                 self.emit(ASM_LABEL.format(label=if_label), mode="raw")
 
@@ -684,7 +676,10 @@ class Compiler:
                             return
                         # Generate label only after confirming string is non-empty
                         (label,) = self.fresh_label_group("const")
-                        self.emit(ASM_DATA_STRING.format(label=label, value=string_value), section="data")
+                        self.emit(
+                            ASM_DATA_STRING.format(label=label, value=string_value),
+                            section="data",
+                        )
                         self.emit("", section="data")
                         self.emit(ASM_PRINT_STRING.format(label=label))
                     case Expr():
@@ -700,7 +695,10 @@ class Compiler:
                             return
                         # Generate label only after confirming string is non-empty
                         (label,) = self.fresh_label_group("const")
-                        self.emit(ASM_DATA_STRING.format(label=label, value=string_value), section="data")
+                        self.emit(
+                            ASM_DATA_STRING.format(label=label, value=string_value),
+                            section="data",
+                        )
                         self.emit("", section="data")
                         self.emit(ASM_PRINTLN_STRING.format(label=label))
                     case Expr():
@@ -787,9 +785,7 @@ class Compiler:
                         self.emit(ASM_BINOP_DIV)
                     case _ if op in COMPARISON_CONDITIONS:
                         # Comparison operators produce boolean results (0 or 1)
-                        self.emit(
-                            ASM_BINOP_CMP.format(condition=COMPARISON_CONDITIONS[op])
-                        )
+                        self.emit(ASM_BINOP_CMP.format(condition=COMPARISON_CONDITIONS[op]))
                     case _:
                         raise ValueError(f"Unexpected operator '{op}'")
 
