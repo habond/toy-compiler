@@ -142,6 +142,29 @@ class WhileLoop(Statement):
 
 
 @dataclass
+class ForLoop(Statement):
+    """For loop statement.
+
+    Executes initialization once, then repeatedly evaluates condition and
+    executes body followed by update while condition is true (non-zero).
+
+    Equivalent to:
+        init;
+        while (condition) {
+            body;
+            update;
+        }
+    """
+
+    init_var: str
+    init_value: "Expr"
+    condition: "Expr"
+    update_var: str
+    update_value: "Expr"
+    body: list[Statement]
+
+
+@dataclass
 class ReturnStmt(Statement):
     """Return statement.
 

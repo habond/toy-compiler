@@ -289,6 +289,62 @@ class TestControlFlow:
         # Continue should jump to loop start
         assert "jmp while." in asm
 
+    def test_for_loop(self):
+        """Test compiling a for loop."""
+        code = "for i = 0; i < 10; i = i + 1 { println i; }"
+        asm = compile_code(code)
+
+        # Should have loop initialization
+        assert "push qword 0" in asm
+
+        # Should have loop labels
+        assert "for." in asm  # Loop condition check
+        assert "update." in asm  # Update section
+        assert "done." in asm  # Loop end
+
+        # Should have condition check and conditional jump
+        assert "cmp rax, 0" in asm
+        assert "je done." in asm  # Exit if condition false
+
+        # Should jump back to condition check
+        assert "jmp for." in asm
+
+    def test_for_loop_with_break(self):
+        """Test compiling a for loop with break statement."""
+        code = "for i = 0; i < 10; i = i + 1 { if i == 5 { break; } }"
+        asm = compile_code(code)
+
+        # Break should jump to loop end (done label)
+        assert "done." in asm
+        # Should have at least one jump to done (the break)
+        assert asm.count("jmp done.") >= 1
+
+    def test_for_loop_with_continue(self):
+        """Test compiling a for loop with continue statement."""
+        code = "for i = 0; i < 10; i = i + 1 { if i == 5 { continue; } }"
+        asm = compile_code(code)
+
+        # Continue should jump to update section
+        assert "update." in asm
+        # Should have at least one jump to update (the continue)
+        assert asm.count("jmp update.") >= 1
+
+    def test_nested_for_loops(self):
+        """Test compiling nested for loops."""
+        code = """
+        for x = 0; x < 3; x = x + 1 {
+            for y = 0; y < 2; y = y + 1 {
+                println y;
+            }
+        }
+        """
+        asm = compile_code(code)
+
+        # Should have two sets of loop labels
+        assert asm.count("for.") >= 2  # Two for loops
+        assert asm.count("update.") >= 2  # Two update sections
+        assert asm.count("done.") >= 2  # Two done labels
+
 
 class TestSubroutines:
     """Tests for subroutine compilation."""

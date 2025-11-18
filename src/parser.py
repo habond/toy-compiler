@@ -107,6 +107,23 @@ class ASTBuilder(Transformer):
         return WhileLoop(condition=condition, body=list(body))
 
     @with_location
+    def for_stmt(self, children: list) -> ForLoop:
+        init_var: str = children[0]
+        init_value: Expr = children[1]
+        condition: Expr = children[2]
+        update_var: str = children[3]
+        update_value: Expr = children[4]
+        body: list = children[5:]
+        return ForLoop(
+            init_var=init_var,
+            init_value=init_value,
+            condition=condition,
+            update_var=update_var,
+            update_value=update_value,
+            body=list(body),
+        )
+
+    @with_location
     def return_stmt(self, children: list) -> ReturnStmt:
         expr: Expr = children[0]
         return ReturnStmt(expr=expr)

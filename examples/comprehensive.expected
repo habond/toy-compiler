@@ -19,7 +19,7 @@ Test 5: Factorial Computation
   4! = 24
   Verification: 4! > 3!
 
-Test 6: Even Number Filter
+Test 6: Even Number Filter (while loop)
   Even numbers from 5 to 1:
     4
     2
@@ -28,7 +28,7 @@ Test 7: Divisibility Search
   First multiple of 7 in [1, 20]: 
 7
 
-Test 8: Skip Counter (continue)
+Test 8: Skip Counter (while with continue)
   Count 1-10 skipping multiples of 3: 
 7
 
@@ -36,7 +36,7 @@ Test 9: Search with Break
   Find first number > 50:
     51
 
-Test 10: Odd Number Filter (continue)
+Test 10: Odd Number Filter (while with continue)
   Odd numbers 1 to 5:
     1
     3
@@ -53,7 +53,7 @@ Test 13: Grade Classification
 85
   Grade: B
 
-Test 14: Nested Loop Computation
+Test 14: Nested Loop Computation (while loops)
   Nested loop result: 
 32
 
@@ -88,6 +88,65 @@ Test 22: Function Call in Boolean
 
 Test 23: Complex Expression
   4!/4 + abs(-5) - (-2) = 13
+
+Test 24: Basic For Loop
+  Count 1 to 5:
+    1
+    2
+    3
+    4
+    5
+
+Test 25: For Loop Sum
+  Sum 1 to 5 = 15
+
+Test 26: Power Function (for loop)
+  2^5 = 32
+
+Test 27: For Loop with Continue
+  Even numbers in [1,10]: 5
+
+Test 28: Nested For Loops
+  Multiplication table (partial):
+    1*1=1
+    1*2=2
+    1*3=3
+    2*1=2
+    2*2=4
+    2*3=6
+    3*1=3
+    3*2=6
+    3*3=9
+
+Test 29: For Loop with Break
+  Find first square > 20:
+    5^2 = 25
+
+Test 30: Countdown For Loop
+  Countdown from 5:
+    5
+    4
+    3
+    2
+    1
+  Liftoff!
+
+Test 31: For Loop with Skip Pattern
+  Numbers 1-10, skip multiples of 3:
+    1
+    2
+    4
+    5
+    7
+    8
+    10
+
+Test 32: Mixed Loops (for inside while)
+  Complex nesting:
+    0
+    1
+    10
+    11
 
 === All Tests Complete ===
 Test result marker: 

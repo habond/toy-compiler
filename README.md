@@ -12,7 +12,7 @@ The language supports:
 - **Unary Operators**: `-` (negation), `!` (logical NOT)
 - **Comparisons**: `==`, `!=`, `<`, `<=`, `>`, `>=` (return 1 for true, 0 for false)
 - **Boolean Logic**: `&&` (AND), `||` (OR) with short-circuit evaluation
-- **Control Flow**: `if` statements with optional `else` blocks, `while` loops, `break`, and `continue`
+- **Control Flow**: `if` statements with optional `else` blocks, `while` loops, `for` loops, `break`, and `continue`
 - **Output**: `print` (no newline) and `println` (with newline) for displaying integers and string literals
 - **Comments**: Single-line comments with `//`
 
@@ -141,6 +141,8 @@ if y == 0 {
 ```
 
 ### Loops
+
+**While Loops:**
 ```
 // While loops with comparisons
 counter = 5;
@@ -175,20 +177,72 @@ while i < 10 {
     }
     print i;
 }
+```
 
-// Nested loops with break/continue
-x = 0;
-while x < 3 {
-    y = 0;
-    while y < 3 {
-        if y == 1 {
-            y = y + 1;
-            continue;  // Skip when y is 1
-        }
-        print x * 10 + y;
-        y = y + 1;
+**For Loops:**
+```
+// Basic for loop: for var = init; condition; var = update { body }
+for i = 1; i <= 5; i = i + 1 {
+    println i;  // Prints 1 2 3 4 5
+}
+
+// Counting down
+for i = 10; i > 0; i = i - 1 {
+    println i;  // Counts from 10 to 1
+}
+
+// Using for loops in functions
+sub sum_range(start, end) {
+    total = 0;
+    for i = start; i <= end; i = i + 1 {
+        total = total + i;
     }
-    x = x + 1;
+    return total;
+}
+
+// For loops with break
+for i = 0; i < 100; i = i + 1 {
+    if i * i > 50 {
+        break;  // Exit when square exceeds 50
+    }
+    println i;
+}
+
+// For loops with continue
+for i = 1; i <= 10; i = i + 1 {
+    if i == 3 || i == 7 {
+        continue;  // Skip 3 and 7
+    }
+    println i;
+}
+
+// Nested for loops
+for row = 1; row <= 3; row = row + 1 {
+    for col = 1; col <= 3; col = col + 1 {
+        product = row * col;
+        println product;
+    }
+}
+```
+
+**Nested Loops (mixing while and for):**
+```
+// For loop inside while loop
+outer = 0;
+while outer < 2 {
+    for inner = 0; inner < 3; inner = inner + 1 {
+        println inner;
+    }
+    outer = outer + 1;
+}
+
+// While loop inside for loop
+for i = 0; i < 3; i = i + 1 {
+    j = 0;
+    while j < 2 {
+        println j;
+        j = j + 1;
+    }
 }
 ```
 
@@ -251,7 +305,6 @@ toy-compiler/
 │   ├── grammar.lark      # Lark grammar definition
 │   ├── ast_nodes.py      # AST node class definitions (pure data classes)
 │   ├── ast_walker.py     # AST walker utilities
-│   ├── code_printer.py   # Convert AST back to source code
 │   ├── var_utils.py      # Variable collection utilities
 │   ├── parser.py         # Parser and AST builder
 │   ├── asm_writer.py     # Assembly section writer
@@ -260,7 +313,6 @@ toy-compiler/
 ├── tests/                # Comprehensive unit test suite
 │   ├── test_ast_nodes.py    # Tests for AST node definitions
 │   ├── test_parser.py       # Tests for parser and AST building
-│   ├── test_code_printer.py # Tests for code printing
 │   ├── test_compiler.py     # Tests for assembly generation
 │   ├── test_ast_walker.py   # Tests for AST traversal
 │   ├── test_var_utils.py    # Tests for variable utilities
@@ -330,11 +382,9 @@ python3 src/cli.py examples/hello.toy build/hello.asm
 ```python
 from src.parser import Parser
 from src.compiler import Compiler
-from src.code_printer import CodePrinter
 
 parser = Parser()
 compiler = Compiler()
-printer = CodePrinter()
 
 code = """
 // Simple program
@@ -348,11 +398,6 @@ ast = parser.parse(code, filename="example.toy")
 # AST nodes are pure data classes - use default repr for debugging
 print("AST structure:", ast)
 # Output: Program(top_level=[Assignment(name='x', value=Number(value=42, location=...), location=...), ...])
-
-# Convert AST back to source code using CodePrinter
-source = printer.print(ast)
-print("Source code:", source)
-# Output: x = 42;\nprintln x;
 
 # Compile to assembly
 asm = compiler.compile(ast)
@@ -486,9 +531,8 @@ pytest --cov=src --cov-report=term-missing
 
 The test suite includes comprehensive tests for:
 - **test_ast_nodes.py**: AST node creation and source location tracking
-- **test_parser.py**: Parsing all language constructs
-- **test_code_printer.py**: Converting AST back to source code
-- **test_compiler.py**: Assembly code generation
+- **test_parser.py**: Parsing all language constructs (including for loops)
+- **test_compiler.py**: Assembly code generation for all statements
 - **test_ast_walker.py**: AST traversal utilities
 - **test_var_utils.py**: Variable collection and analysis
 - **test_asm_writer.py**: Assembly section writer
@@ -547,6 +591,7 @@ The `examples/` directory contains several programs demonstrating language featu
 - **test.toy**: Variable reassignment
 - **conditional.toy**: If/else statements with truthy/falsy conditions
 - **loop.toy**: While loops including nested loops
+- **for_loop.toy**: For loops with break, continue, and nesting
 - **comparisons.toy**: All comparison operators (`==`, `!=`, `<`, `<=`, `>`, `>=`)
 - **boolean_ops.toy**: Boolean operators (`&&`, `||`) with short-circuit evaluation
 - **unary.toy**: Unary operators (negation `-`, logical NOT `!`)
@@ -554,7 +599,7 @@ The `examples/` directory contains several programs demonstrating language featu
 - **strings.toy**: String literal printing demonstrating `print` (no newline) and `println` (with newline)
 - **simple_sub.toy**: Basic subroutine with parameters and return value
 - **subroutines.toy**: Advanced subroutine features including recursion, void functions, and nested calls
-- **comprehensive.toy**: Complete feature showcase with narrative string output including all operators, subroutines, recursion, nested loops, conditionals, and control flow
+- **comprehensive.toy**: Complete feature showcase with narrative string output including all operators, subroutines, recursion, nested loops, conditionals, and control flow (both while and for loops)
 
 Each example has a corresponding `.expected` file for automated testing.
 
@@ -572,9 +617,9 @@ The AST (Abstract Syntax Tree) implementation follows a clean separation of conc
 - Each node includes `SourceLocation` metadata tracking file, line, and column positions
 
 **Separate Concerns:**
-- `CodePrinter` - Converts AST back to source code representation
 - `Compiler` - Transforms AST into x86-64 assembly
 - `ASTWalker` - Traverses AST for analysis (variable collection, etc.)
+- Clean separation allows for easy addition of new processors (formatters, linters, etc.)
 
 **Source Location Tracking:**
 - Every AST node includes a `location: SourceLocation | None` field
@@ -592,7 +637,7 @@ The AST (Abstract Syntax Tree) implementation follows a clean separation of conc
 **Benefits:**
 ```python
 from src.parser import Parser
-from src.code_printer import CodePrinter
+from src.compiler import Compiler
 
 ast = Parser().parse("x = 5; println x;", filename="example.toy")
 
@@ -608,11 +653,10 @@ assignment = ast.top_level[0]
 print(f"Assignment at {assignment.location}")
 # Output: Assignment at example.toy:1:1
 
-# Code generation: Pretty-print source
-printer = CodePrinter()
-print(printer.print(ast))
-# x = 5;
-# println x;
+# Code generation: Compile to assembly
+compiler = Compiler()
+asm = compiler.compile(ast)
+print(asm[:200])
 
 # Use locations for enhanced error messages
 from src.ast_walker import walk
@@ -625,7 +669,7 @@ def find_undefined_vars(ast, defined_vars):
             # Output: Error at example.toy:2:9: Undefined variable 'x'
 
 # Easy to add new representations without modifying AST nodes
-# Could add: MinifiedPrinter, JSONPrinter, GraphvizPrinter, etc.
+# Could add: CodeFormatter, JSONExporter, GraphvizVisualizer, etc.
 ```
 
 This design keeps AST nodes simple and makes it easy to add new ways to process or display the AST without changing the core data structures. The source location tracking enables precise error reporting, IDE integration (go-to-definition, rename refactoring), code coverage analysis, and other developer tools.

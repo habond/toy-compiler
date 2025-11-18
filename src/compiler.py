@@ -595,9 +595,6 @@ class Compiler:
         Raises:
             ValueError: If an unknown statement type is encountered.
         """
-        self.emit("")
-        self.emit(f"; {statement}")  # Emit source statement as comment for readability
-
         match statement:
             case Assignment(name, expr):
                 # Evaluate expression (result left on stack)
@@ -620,11 +617,14 @@ class Compiler:
                 if else_body:
                     # If-else: jump to else if condition is false
                     self.emit(ASM_CONDITION_CHECK.format(label=else_label))
+
                     # Compile then branch
                     for statement in then_body:
                         self.statement(statement)
+
                     # Jump past else branch after completing then branch
                     self.emit(ASM_JMP.format(label=fi_label))
+
                     # Compile else branch
                     self.emit("; Else branch")
                     self.emit(ASM_LABEL.format(label=else_label), mode="raw")
@@ -633,6 +633,7 @@ class Compiler:
                 else:
                     # If-only: jump to end if condition is false
                     self.emit(ASM_CONDITION_CHECK.format(label=fi_label))
+
                     # Compile then branch
                     for statement in then_body:
                         self.statement(statement)
@@ -664,6 +665,47 @@ class Compiler:
 
                 # Loop exit point
                 self.emit("; End while")
+                self.emit(ASM_LABEL.format(label=done_label), mode="raw")
+
+                self.pop_loop_labels()
+
+            case ForLoop(init_var, init_value, condition, update_var, update_value, body):
+                # Generate unique labels for loop start, update, and exit
+                for_label, update_label, done_label = self.fresh_label_group(
+                    "for", "update", "done"
+                )
+                # Push update_label as the "start" for continue statements
+                self.push_loop_labels(update_label, done_label)
+                self.emit("; For loop")
+
+                # Initialize loop variable
+                self.expr(init_value)
+                offset = self.get_var_offset(init_var)
+                self.emit(ASM_ASSIGNMENT.format(offset=offset))
+
+                # Loop entry point (condition check)
+                self.emit(ASM_LABEL.format(label=for_label), mode="raw")
+                self.expr(condition)
+                self.emit("")
+
+                # Exit loop if condition is false
+                self.emit(ASM_CONDITION_CHECK.format(label=done_label))
+
+                # Compile loop body
+                for statement in body:
+                    self.statement(statement)
+
+                # Update section (continue jumps here)
+                self.emit(ASM_LABEL.format(label=update_label), mode="raw")
+                self.expr(update_value)
+                offset = self.get_var_offset(update_var)
+                self.emit(ASM_ASSIGNMENT.format(offset=offset))
+
+                # Jump back to condition check
+                self.emit(ASM_JMP.format(label=for_label))
+
+                # Loop exit point
+                self.emit("; End for")
                 self.emit(ASM_LABEL.format(label=done_label), mode="raw")
 
                 self.pop_loop_labels()

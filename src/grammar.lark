@@ -10,6 +10,7 @@ start: top_level+
           | println_stmt
           | if_stmt
           | while_stmt
+          | for_stmt
           | return_stmt
           | call_stmt
           | break_stmt
@@ -42,6 +43,8 @@ then_block: "{" statement* "}"
 else_block: "else" "{" statement* "}"
 
 while_stmt: "while" expr "{" statement* "}"
+
+for_stmt: "for" NAME "=" expr ";" expr ";" NAME "=" expr "{" statement* "}"
 
 ?expr: logical_or
 

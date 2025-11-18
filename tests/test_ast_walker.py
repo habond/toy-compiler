@@ -166,6 +166,27 @@ class TestControlFlowWalking:
         assert isinstance(nodes[1], BinOp)  # condition
         assert isinstance(nodes[5], BinOp)  # assignment value
 
+    def test_walk_for_loop(self):
+        """Test walking for loop."""
+        node = ForLoop(
+            init_var="i",
+            init_value=Number(value=0),
+            condition=BinOp(op=BinOpType.LT, left=Var(name="i"), right=Number(value=10)),
+            update_var="i",
+            update_value=BinOp(op=BinOpType.ADD, left=Var(name="i"), right=Number(value=1)),
+            body=[Println(value=Var(name="i"))],
+        )
+        nodes = list(walk(node))
+
+        # ForLoop, Number (init), BinOp (condition), Var, Number,
+        # BinOp (update), Var, Number, Println, Var
+        assert len(nodes) == 10
+        assert isinstance(nodes[0], ForLoop)
+        assert isinstance(nodes[1], Number)  # init_value
+        assert isinstance(nodes[2], BinOp)  # condition
+        assert isinstance(nodes[5], BinOp)  # update_value
+        assert isinstance(nodes[8], Println)  # body
+
 
 class TestProgramWalking:
     """Tests for walking program structures."""

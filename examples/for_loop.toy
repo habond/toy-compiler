@@ -1,0 +1,36 @@
+// Basic for loop example
+for i = 1; i <= 5; i = i + 1 {
+    println i;
+}
+
+println 0;
+
+// Nested for loops
+for x = 0; x < 3; x = x + 1 {
+    for y = 0; y < 2; y = y + 1 {
+        result = x * 10 + y;
+        println result;
+    }
+}
+
+println 999;
+
+// For loop with break
+for i = 0; i < 10; i = i + 1 {
+    if i == 5 {
+        break;
+    }
+    println i;
+}
+
+println 888;
+
+// For loop with continue
+for i = 0; i < 5; i = i + 1 {
+    if i == 2 {
+        continue;
+    }
+    println i;
+}
+
+println 777;

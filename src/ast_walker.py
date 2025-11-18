@@ -80,6 +80,15 @@ def walk(node: ASTNode, skip: list[type[ASTNode]] | None = None) -> Iterator[AST
             for stmt in body:
                 yield from walk(stmt, skip)
 
+        case ForLoop(
+            init_value=init_value, condition=condition, update_value=update_value, body=body
+        ):
+            yield from walk(init_value, skip)
+            yield from walk(condition, skip)
+            yield from walk(update_value, skip)
+            for stmt in body:
+                yield from walk(stmt, skip)
+
         case BinOp(left=left, right=right):
             yield from walk(left, skip)
             yield from walk(right, skip)

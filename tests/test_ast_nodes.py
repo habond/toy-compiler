@@ -90,6 +90,27 @@ class TestStatements:
         assert stmt.condition == cond
         assert stmt.body == body
 
+    def test_for_loop(self):
+        """Test for loop node."""
+        init_value = Number(value=0)
+        cond = BinOp(op=BinOpType.LT, left=Var(name="i"), right=Number(value=10))
+        update_value = BinOp(op=BinOpType.ADD, left=Var(name="i"), right=Number(value=1))
+        body = cast(list[Statement], [Println(value=Var(name="i"))])
+        stmt = ForLoop(
+            init_var="i",
+            init_value=init_value,
+            condition=cond,
+            update_var="i",
+            update_value=update_value,
+            body=body,
+        )
+        assert stmt.init_var == "i"
+        assert stmt.init_value == init_value
+        assert stmt.condition == cond
+        assert stmt.update_var == "i"
+        assert stmt.update_value == update_value
+        assert stmt.body == body
+
     def test_return_stmt(self):
         """Test return statement node."""
         expr = Number(value=42)

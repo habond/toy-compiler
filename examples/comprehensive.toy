@@ -71,6 +71,36 @@ sub count_skip_threes(start, end) {
     return count;
 }
 
+// Sum numbers in a range using for loop
+sub sum_range(start, end) {
+    total = 0;
+    for i = start; i <= end; i = i + 1 {
+        total = total + i;
+    }
+    return total;
+}
+
+// Calculate power using for loop
+sub power(base, exp) {
+    result = 1;
+    for i = 0; i < exp; i = i + 1 {
+        result = result * base;
+    }
+    return result;
+}
+
+// Count even numbers in range using for loop with continue
+sub count_evens(start, end) {
+    count = 0;
+    for i = start; i <= end; i = i + 1 {
+        if !is_even(i) {
+            continue;
+        }
+        count = count + 1;
+    }
+    return count;
+}
+
 // ===== Test Suite =====
 
 println "Test 1: Absolute Value";
@@ -123,7 +153,7 @@ if fact4 > fact3 {
 }
 println "";
 
-println "Test 6: Even Number Filter";
+println "Test 6: Even Number Filter (while loop)";
 println "  Even numbers from 5 to 1:";
 counter = 5;
 while counter > 0 {
@@ -141,7 +171,7 @@ first_div_7 = find_divisible(1, 20, 7);
 println first_div_7;
 println "";
 
-println "Test 8: Skip Counter (continue)";
+println "Test 8: Skip Counter (while with continue)";
 println "  Count 1-10 skipping multiples of 3: ";
 count = count_skip_threes(1, 10);
 println count;
@@ -160,7 +190,7 @@ print "    ";
 println search;
 println "";
 
-println "Test 10: Odd Number Filter (continue)";
+println "Test 10: Odd Number Filter (while with continue)";
 println "  Odd numbers 1 to 5:";
 num = 0;
 while num < 6 {
@@ -212,7 +242,7 @@ if !(score < passing) {
 }
 println "";
 
-println "Test 14: Nested Loop Computation";
+println "Test 14: Nested Loop Computation (while loops)";
 i = 3;
 total = 0;
 
@@ -316,6 +346,95 @@ println "Test 23: Complex Expression";
 final = factorial(4) / 4 + abs(-5) - -2;
 print "  4!/4 + abs(-5) - (-2) = ";
 println final;
+println "";
+
+println "Test 24: Basic For Loop";
+println "  Count 1 to 5:";
+for i = 1; i <= 5; i = i + 1 {
+    print "    ";
+    println i;
+}
+println "";
+
+println "Test 25: For Loop Sum";
+sum = sum_range(1, 5);
+print "  Sum 1 to 5 = ";
+println sum;
+println "";
+
+println "Test 26: Power Function (for loop)";
+result = power(2, 5);
+print "  2^5 = ";
+println result;
+println "";
+
+println "Test 27: For Loop with Continue";
+evens = count_evens(1, 10);
+print "  Even numbers in [1,10]: ";
+println evens;
+println "";
+
+println "Test 28: Nested For Loops";
+println "  Multiplication table (partial):";
+for row = 1; row <= 3; row = row + 1 {
+    for col = 1; col <= 3; col = col + 1 {
+        product = row * col;
+        print "    ";
+        print row;
+        print "*";
+        print col;
+        print "=";
+        println product;
+    }
+}
+println "";
+
+println "Test 29: For Loop with Break";
+println "  Find first square > 20:";
+for n = 1; n <= 10; n = n + 1 {
+    square = n * n;
+    if square > 20 {
+        print "    ";
+        print n;
+        print "^2 = ";
+        println square;
+        break;
+    }
+}
+println "";
+
+println "Test 30: Countdown For Loop";
+println "  Countdown from 5:";
+for i = 5; i > 0; i = i - 1 {
+    print "    ";
+    println i;
+}
+println "  Liftoff!";
+println "";
+
+println "Test 31: For Loop with Skip Pattern";
+println "  Numbers 1-10, skip multiples of 3:";
+for i = 1; i <= 10; i = i + 1 {
+    remainder = i - i / 3 * 3;
+    if remainder == 0 {
+        continue;
+    }
+    print "    ";
+    println i;
+}
+println "";
+
+println "Test 32: Mixed Loops (for inside while)";
+println "  Complex nesting:";
+outer = 0;
+while outer < 2 {
+    for inner = 0; inner < 2; inner = inner + 1 {
+        value = outer * 10 + inner;
+        print "    ";
+        println value;
+    }
+    outer = outer + 1;
+}
 println "";
 
 println "=== All Tests Complete ===";

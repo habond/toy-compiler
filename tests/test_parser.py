@@ -126,6 +126,46 @@ class TestControlFlow:
         assert while_loop.condition.op == BinOpType.LT
         assert len(while_loop.body) == 1
 
+    def test_for_loop(self, parser):
+        """Test parsing a for loop."""
+        code = "for i = 0; i < 10; i = i + 1 { println i; }"
+        ast = parser.parse(code, "test.toy")
+
+        assert len(ast.top_level) == 1
+        for_loop = ast.top_level[0]
+        assert isinstance(for_loop, ForLoop)
+        assert for_loop.init_var == "i"
+        assert isinstance(for_loop.init_value, Number)
+        assert for_loop.init_value.value == 0
+        assert isinstance(for_loop.condition, BinOp)
+        assert for_loop.condition.op == BinOpType.LT
+        assert for_loop.update_var == "i"
+        assert isinstance(for_loop.update_value, BinOp)
+        assert for_loop.update_value.op == BinOpType.ADD
+        assert len(for_loop.body) == 1
+
+    def test_nested_for_loops(self, parser):
+        """Test parsing nested for loops."""
+        code = """
+        for x = 0; x < 3; x = x + 1 {
+            for y = 0; y < 2; y = y + 1 {
+                println y;
+            }
+        }
+        """
+        ast = parser.parse(code, "test.toy")
+
+        assert len(ast.top_level) == 1
+        outer_loop = ast.top_level[0]
+        assert isinstance(outer_loop, ForLoop)
+        assert outer_loop.init_var == "x"
+        assert len(outer_loop.body) == 1
+
+        inner_loop = outer_loop.body[0]
+        assert isinstance(inner_loop, ForLoop)
+        assert inner_loop.init_var == "y"
+        assert len(inner_loop.body) == 1
+
 
 class TestExpressions:
     """Tests for expression parsing."""
